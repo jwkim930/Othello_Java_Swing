@@ -6,5 +6,5 @@ public interface Rebuildable {
     /**
      * Refresh the view to show the latest information.
      */
-    public void rebuild();
+    void rebuild();
 }

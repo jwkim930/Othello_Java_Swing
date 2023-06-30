@@ -5,15 +5,25 @@ public class StartupFrame extends JFrame {
     private JLabel title;
     private JPanel sizeSliderPanel;
     private JButton startButton;
+    /** The horizontal size of the window in pixels */
     public final static int SIZE_X = 400;
+    /** The vertical size of the window in pixels */
     public final static int SIZE_Y = 200;
-    public final static int SIZE_MIN = 4;
-    public final static int SIZE_MAX = 24;
-    public final static int SIZE_INITIAL = 8;
+    /** Minimum board size */
+    private final static int SIZE_MIN = 4;
+    /** Maximum board size */
+    private final static int SIZE_MAX = 24;
+    /** Default board size */
+    private final static int SIZE_INITIAL = 8;
 
     public StartupFrame() {
         super("Othello");
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
+        // place window in the middle of the screen
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int locationX = (int) (screenSize.getWidth() - SIZE_X) / 2;
+        int locationY = (int) (screenSize.getHeight() - SIZE_Y) / 2;
+        this.setLocation(new Point(locationX, locationY));
 
         // Title label
         this.title = new JLabel("Othello");
@@ -56,6 +66,11 @@ public class StartupFrame extends JFrame {
         JFrame frame = new GameFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
+        // place window in the middle of the screen
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int locationX = (int) (screenSize.getWidth() - GameFrame.SIZE_X) / 2;
+        int locationY = (int) (screenSize.getHeight() - GameFrame.SIZE_Y) / 2;
+        frame.setLocation(new Point(locationX, locationY));
         this.setVisible(false);
         frame.setVisible(true);
         this.dispose();
