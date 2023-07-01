@@ -1,3 +1,5 @@
+package backend;
+
 public class Board {
     private int[][] squares;
     public static int size;

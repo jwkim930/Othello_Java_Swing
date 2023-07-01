@@ -1,5 +1,9 @@
+package gui;
+
 import javax.swing.*;
 import java.awt.*;
+
+import backend.Board;
 
 public class StartupFrame extends JFrame {
     private JLabel title;
@@ -39,14 +43,14 @@ public class StartupFrame extends JFrame {
         this.sizeSliderPanel = new JPanel();
         this.sizeSliderPanel.setLayout(new BoxLayout(this.sizeSliderPanel, BoxLayout.PAGE_AXIS));
         this.sizeSliderPanel.setAlignmentX(0.5f);
-        JLabel sizeLabel = new JLabel("Board size: " + SIZE_INITIAL);
+        JLabel sizeLabel = new JLabel("backend.Board size: " + SIZE_INITIAL);
         sizeLabel.setAlignmentX(0.5f);
         JSlider sizeSlider = new JSlider(SIZE_MIN, SIZE_MAX, SIZE_INITIAL);
         sizeSlider.setSize(new Dimension((int) (SIZE_X * 0.8), 18));
         sizeSlider.setPreferredSize(new Dimension((int) (SIZE_X * 0.8), 18));
         sizeSlider.setMinimumSize(new Dimension((int) (SIZE_X * 0.8), 18));
         sizeSlider.setMaximumSize(new Dimension((int) (SIZE_X * 0.8), 18));
-        sizeSlider.addChangeListener(e -> sizeLabel.setText("Board size: " + sizeSlider.getValue()));
+        sizeSlider.addChangeListener(e -> sizeLabel.setText("backend.Board size: " + sizeSlider.getValue()));
         this.sizeSliderPanel.add(sizeLabel);
         this.sizeSliderPanel.add(sizeSlider);
         this.add(this.sizeSliderPanel);
