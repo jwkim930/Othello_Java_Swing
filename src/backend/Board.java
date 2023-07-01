@@ -21,6 +21,7 @@ public class Board {
      * Sets the board size. Can only be called once.
      *
      * @param sz The desired board size.
+     * @throws IllegalStateException If it is called more than once in a single program execution.
      */
     public static void setSize(int sz) {
         if (sz != -1) {
@@ -35,6 +36,7 @@ public class Board {
      * Get the size of the board. The size must already have been set.
      *
      * @return The size of the board.
+     * @throws IllegalStateException If it is called before setSize() is called.
      */
     public int getSize() {
         if (size == -1) {
@@ -60,5 +62,10 @@ public class Board {
 
     public void finish() {
         // stub for now
+    }
+
+    public SquarePanel getAdjacent(Direction direction) {
+        // stub for now
+        return new SquarePanel();
     }
 }

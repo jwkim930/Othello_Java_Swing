@@ -26,10 +26,7 @@ public class DirectionUnitTest {
     }
 
     @Test
-    public void testCompare() {
-        assertTrue(Direction.TOP.compareTo(Direction.BOTTOM) < 0);
-        assertTrue(Direction.LEFT.compareTo(Direction.RIGHT) > 0);
-        assertEquals(0, Direction.TOP_RIGHT.compareTo(Direction.TOP_RIGHT));
+    public void testEquals() {
         assertEquals(Direction.TOP, Direction.TOP);
         assertNotEquals(Direction.TOP, Direction.BOTTOM);
         assertNotEquals(Direction.TOP, "Top");

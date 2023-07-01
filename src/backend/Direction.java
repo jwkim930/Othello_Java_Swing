@@ -4,7 +4,7 @@ package backend;
  * Represents a direction. There are 8 directions in total.
  * Use the constants to access each.
  */
-public class Direction implements Comparable<Direction> {
+public class Direction {
     /**
      * The name of the direction. Access with toString().
      */
@@ -87,22 +87,6 @@ public class Direction implements Comparable<Direction> {
     public Direction counterClockwise() {
         int newTracker = this.tracker > 1 ? this.tracker - 1 : 8;   // for overflow
         return new Direction(newTracker);
-    }
-
-    /**
-     * Compares this object with the specified object for order.  Returns a
-     * negative integer, zero, or a positive integer as this object is less
-     * than, equal to, or greater than the specified object.
-     * The top direction is the "least", whereas top-left is the "greatest".
-     * The "size" increases clockwise.
-     *
-     * @param dir the Direction object to be compared.
-     * @return a negative integer, zero, or a positive integer as this object
-     * is less than, equal to, or greater than the specified object.
-     */
-    @Override
-    public int compareTo(Direction dir) {
-        return Integer.compare(this.tracker, dir.tracker);
     }
 
     /**
