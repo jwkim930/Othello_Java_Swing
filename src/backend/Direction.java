@@ -1,5 +1,9 @@
 package backend;
 
+/**
+ * Represents a direction. There are 8 directions in total.
+ * Use the constants to access each.
+ */
 public class Direction implements Comparable<Direction> {
     /**
      * The name of the direction. Access with toString().
@@ -11,40 +15,40 @@ public class Direction implements Comparable<Direction> {
      */
     private int tracker;
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction TOP = new Direction(1);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction TOP_RIGHT = new Direction(2);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction RIGHT = new Direction(3);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction BOTTOM_RIGHT = new Direction(4);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction BOTTOM = new Direction(5);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction BOTTOM_LEFT = new Direction(6);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction LEFT = new Direction(7);
     /**
-     * backend.Direction object representing the respective direction.
+     * Direction object representing the respective direction.
      */
     public static final Direction TOP_LEFT = new Direction(8);
 
     /**
-     * Creates a backend.Direction object with the specified direction.
+     * Creates a Direction object with the specified direction.
      * Starting from the top, there are 8 directions that
      * proceed clockwise.
      *
@@ -92,7 +96,7 @@ public class Direction implements Comparable<Direction> {
      * The top direction is the "least", whereas top-left is the "greatest".
      * The "size" increases clockwise.
      *
-     * @param dir the backend.Direction object to be compared.
+     * @param dir the Direction object to be compared.
      * @return a negative integer, zero, or a positive integer as this object
      * is less than, equal to, or greater than the specified object.
      */
@@ -103,7 +107,7 @@ public class Direction implements Comparable<Direction> {
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     * A backend.Direction object can only be equal to another backend.Direction object.
+     * A Direction object can only be equal to another Direction object.
      *
      * @param obj the reference object with which to compare.
      * @return {@code true} if this object is the same as the obj

@@ -66,7 +66,7 @@ public class StartupFrame extends JFrame {
     }
 
     public void startGame(int size) {
-        Board.size = size;
+        Board.setSize(size);
         JFrame frame = new GameFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
