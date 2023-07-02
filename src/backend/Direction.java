@@ -75,7 +75,8 @@ public class Direction {
      * @return The new direction as indicated above.
      */
     public Direction clockwise() {
-        return new Direction((this.tracker + 1) % 8);   // modulo for overflow
+        int newTracker = this.tracker < 8 ? this.tracker + 1 : 1;   // overflow if top-left
+        return new Direction(newTracker);
     }
 
     /**
@@ -85,7 +86,7 @@ public class Direction {
      * @return The new direction as indicated above.
      */
     public Direction counterClockwise() {
-        int newTracker = this.tracker > 1 ? this.tracker - 1 : 8;   // for overflow
+        int newTracker = this.tracker > 1 ? this.tracker - 1 : 8;   // overflow if top
         return new Direction(newTracker);
     }
 
