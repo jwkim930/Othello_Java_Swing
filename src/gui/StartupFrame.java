@@ -75,6 +75,7 @@ public class StartupFrame extends JFrame {
         int locationX = (int) (screenSize.getWidth() - GameFrame.SIZE_X) / 2;
         int locationY = (int) (screenSize.getHeight() - GameFrame.SIZE_Y) / 2;
         frame.setLocation(new Point(locationX, locationY));
+        frame.setTitle("Othello: " + size + " x " + size);
         frame.setResizable(false);
         this.setVisible(false);
         frame.setVisible(true);

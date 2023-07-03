@@ -14,7 +14,7 @@ public class BoardPanel extends JPanel implements Rebuildable {
     /**
      * The width/height of this panel in pixels.
      */
-    public static final int SIZE = 600;
+    public static final int SIZE = 650;
 
     /**
      * Initializes the panel. Should only be called once in the beginning.
