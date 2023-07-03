@@ -65,9 +65,13 @@ public class StartupFrame extends JFrame {
         this.add(startButton);
     }
 
+    /**
+     * Initialize and display the main game frame.
+     *
+     * @param size The size of the game board.
+     */
     public void startGame(int size) {
-        Board.setSize(size);
-        JFrame frame = new GameFrame();
+        JFrame frame = new GameFrame(size);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
         // place window in the middle of the screen

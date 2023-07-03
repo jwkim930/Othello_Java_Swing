@@ -43,8 +43,10 @@ public class GameFrame extends JFrame implements Rebuildable {
     /**
      * Initializes the game window. This should be called only once
      * in the beginning.
+     *
+     * @param boardSize The size of the game board.
      */
-    public GameFrame() {
+    public GameFrame(int boardSize) {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
         // first turn is black
@@ -54,7 +56,7 @@ public class GameFrame extends JFrame implements Rebuildable {
         this.add(Box.createRigidArea(new Dimension(0, 30)));
 
         // add BoardPanel
-        this.boardPanel = new BoardPanel();
+        this.boardPanel = new BoardPanel(boardSize);
         this.add(this.boardPanel);
 
         // add an empty space below
@@ -121,7 +123,6 @@ public class GameFrame extends JFrame implements Rebuildable {
     }
 
     public void rebuild() {
-        this.boardPanel.rebuild();
         this.turnIndicatorCircle.repaint();
     }
 

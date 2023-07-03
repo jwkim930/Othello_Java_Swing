@@ -1,26 +1,37 @@
 package backend;
 
 import gui.BoardPanel;
-import gui.GameFrame;
 import gui.SquarePanel;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+
+/**
+ * Represents the game board. This class uses a singleton pattern.
+ * Call initialize() in the beginning and use getInstance() to access it
+ * afterwards.
+ */
 public class Board {
+    /**
+     * The singleton instance of this object.
+     */
+    private static Board instance;
     /**
      * Contains all squares in the board. Access by [row][col].
      */
     private SquarePanel[][] squares;
     /**
      * The size of the board. The board is square, so this is both width and height.
-     * When the board is not initialized, this is -1.
-     * Made static so that the static method setSize() can call it.
      */
-    private static int size = -1;
+    private int size;
 
     /**
      * Initializes the Othello board. Should only be called once in the beginning.
+     *
+     * @param size The size of the board.
      */
-    public Board() {
-        int size = getSize();
+    private Board(int size) {
+        this.size = size;
         this.squares = new SquarePanel[size][size];
         int sqSize = BoardPanel.SIZE / size;
         SquarePanel.setSquareSize(sqSize);
@@ -38,6 +49,36 @@ public class Board {
     }
 
     /**
+     * Initializes the board singleton instance.
+     *
+     * @param sz The size of the board.
+     * @throws InstanceAlreadyExistsException If this has already been called before.
+     */
+    public static void initialize(int sz) throws InstanceAlreadyExistsException {
+        if (instance != null) {
+            throw new InstanceAlreadyExistsException();
+        }
+        else {
+            instance = new Board(sz);
+        }
+    }
+
+    /**
+     * Returns the singleton instance of the board.
+     *
+     * @return The instance of the board.
+     * @throws InstanceNotFoundException If the board has not been initialized yet.
+     */
+    public static Board getInstance() throws InstanceNotFoundException {
+        if (instance == null) {
+            throw new InstanceNotFoundException();
+        }
+        else {
+            return instance;
+        }
+    }
+
+    /**
      * Get the 2D array of square cells in the board.
      *
      * @return The array of square cells in the board.
@@ -47,34 +88,12 @@ public class Board {
     }
 
     /**
-     * Sets the board size. Can only be called once.
-     * Static so that it can be called before calling the constructor.
-     *
-     * @param sz The desired board size.
-     * @throws IllegalStateException If it is called more than once in a single program execution.
-     */
-    public static void setSize(int sz) {
-        if (size != -1) {
-            throw new IllegalStateException("setSize() called when size is already set.");
-        }
-        else {
-            size = sz;
-        }
-    }
-
-    /**
-     * Get the size of the board. The size must already have been set.
+     * Get the size of the board.
      *
      * @return The size of the board.
-     * @throws IllegalStateException If it is called before setSize() is called.
      */
-    public static int getSize() {
-        if (size == -1) {
-            throw new IllegalStateException("Size is not set yet.");
-        }
-        else {
-            return size;
-        }
+    public int getSize() {
+        return this.size;
     }
 
     /**

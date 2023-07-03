@@ -32,6 +32,8 @@ public class SquareMouseListener implements MouseListener {
 
     /**
      * Invoked when a mouse button has been released on a component.
+     * This places the stone if it's a valid move, or flashes the
+     * square otherwise.
      *
      * @param e the event to be processed
      */
