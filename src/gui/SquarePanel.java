@@ -6,6 +6,8 @@ import backend.Stone;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseListener;
+import java.util.concurrent.TimeUnit;
 
 public class SquarePanel extends JPanel implements Rebuildable {
     /**
@@ -16,6 +18,16 @@ public class SquarePanel extends JPanel implements Rebuildable {
      * The size of this square in pixels. It is -1 before it is set.
      */
     private static int squareSize = -1;
+    /**
+     * The color of the background of the square. This changes upon
+     * being interacted.
+     */
+    private Color backgroundColor;
+    /**
+     * The mouse listener to be associated with this square.
+     * Added upon creation, removed upon placing a stone.
+     */
+    private static final SquareMouseListener LISTENER = new SquareMouseListener();
 
     public SquarePanel() {
         super();
@@ -25,14 +37,15 @@ public class SquarePanel extends JPanel implements Rebuildable {
         this.setPreferredSize(sizeDimension);
         this.setMinimumSize(sizeDimension);
         this.setMaximumSize(sizeDimension);
-        this.addMouseListener(new SquareMouseListener());
+        this.addMouseListener(LISTENER);
+        this.backgroundColor = Color.LIGHT_GRAY;
     }
 
     @Override
     public void paintComponent(Graphics g) {
         int size = getSquareSize();
         // draw the square
-        g.setColor(Color.LIGHT_GRAY);
+        g.setColor(this.backgroundColor);
         g.fillRect(0, 0, size, size);
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, size, size);
@@ -48,7 +61,6 @@ public class SquarePanel extends JPanel implements Rebuildable {
     }
 
     public void rebuild() {
-        this.removeAll();
         this.repaint();
     }
 
@@ -58,6 +70,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
 
     /**
      * Places the stone and refreshes the panel.
+     * Once a stone is placed, the square no longer reacts to the mouse.
      *
      * @param stone The stone to be placed.
      * @throws IllegalStateException If the square already has a stone.
@@ -68,6 +81,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
         }
         else {
             this.stone = stone;
+            this.removeMouseListener(LISTENER);
             this.rebuild();
         }
     }
@@ -104,5 +118,42 @@ public class SquarePanel extends JPanel implements Rebuildable {
         else {
             return squareSize;
         }
+    }
+
+    /**
+     * Gets the current background color of this square.
+     *
+     * @return The background color of this square.
+     */
+    public Color getBackgroundColor() {
+        return this.backgroundColor;
+    }
+
+    /**
+     * Sets the background color of this square.
+     * This method does not repaint the square.
+     *
+     * @param color The color to be used as the background.
+     */
+    public void setBackgroundColor(Color color) {
+        this.backgroundColor = color;
+    }
+
+    /**
+     * Flashes the square to indicate that the move was invalid.
+     */
+    public void invalidMoveFlash() {
+        setBackgroundColor(new Color(230, 69, 69));
+        this.rebuild();
+        Thread setColorBack = new Thread(() -> {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            this.setBackgroundColor(Color.LIGHT_GRAY);
+            this.rebuild();
+        });
+        setColorBack.start();
     }
 }
