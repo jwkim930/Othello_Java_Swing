@@ -1,17 +1,14 @@
 package gui;
 
-import backend.Board;
 import backend.SquareMouseListener;
 import backend.Stone;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
-import java.util.concurrent.TimeUnit;
 
 public class SquarePanel extends JPanel implements Rebuildable {
     /**
-     * The stone on this square. null if there is no stone.
+     * The stone on this square. {@code null} if there is no stone.
      */
     private Stone stone;
     /**
@@ -28,8 +25,18 @@ public class SquarePanel extends JPanel implements Rebuildable {
      * Added upon creation, removed upon placing a stone.
      */
     private static final SquareMouseListener LISTENER = new SquareMouseListener();
+    /**
+     * The coordinate of this square on the board. Uses the format [row, col].
+     */
+    private int[] coordinate;
 
-    public SquarePanel() {
+    /**
+     * Initializes a SquarePanel. There is no stone on it initially.
+     *
+     * @param row The row of the square.
+     * @param col The column of the square.
+     */
+    public SquarePanel(int row, int col) {
         super();
         int size = getSquareSize();
         Dimension sizeDimension = new Dimension(size, size);
@@ -39,6 +46,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
         this.setMaximumSize(sizeDimension);
         this.addMouseListener(LISTENER);
         this.backgroundColor = Color.LIGHT_GRAY;
+        this.coordinate = new int[] {row, col};
     }
 
     @Override
@@ -64,6 +72,11 @@ public class SquarePanel extends JPanel implements Rebuildable {
         this.repaint();
     }
 
+    /**
+     * Returns the stone on this square.
+     *
+     * @return The Stone on this square. If there is no stone, this will be {@code null}.
+     */
     public Stone getStone() {
         return this.stone;
     }
@@ -155,5 +168,14 @@ public class SquarePanel extends JPanel implements Rebuildable {
             this.rebuild();
         });
         setColorBack.start();
+    }
+
+    /**
+     * Returns the coordinate of this square.
+     *
+     * @return The coordinate of this square as [row, col].
+     */
+    public int[] getCoordinate() {
+        return this.coordinate;
     }
 }

@@ -5,6 +5,8 @@ import gui.SquarePanel;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the game board. This class uses a singleton pattern.
@@ -24,6 +26,10 @@ public class Board {
      * The size of the board. The board is square, so this is both width and height.
      */
     private int size;
+    /**
+     * The player of the current turn. Black takes the first turn, then it alternates.
+     */
+    private Stone turn;
 
     /**
      * Initializes the Othello board. Should only be called once in the beginning.
@@ -37,7 +43,7 @@ public class Board {
         SquarePanel.setSquareSize(sqSize);
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
-                this.squares[row][col] = new SquarePanel();
+                this.squares[row][col] = new SquarePanel(row, col);
             }
         }
         // place the 4 starting stones
@@ -46,6 +52,8 @@ public class Board {
         this.placeStone(Stone.BLACK, topLeft, topLeft + 1);
         this.placeStone(Stone.BLACK, topLeft + 1, topLeft);
         this.placeStone(Stone.WHITE, topLeft + 1, topLeft + 1);
+        // the first turn is black
+        this.turn = Stone.BLACK;
     }
 
     /**
@@ -56,7 +64,7 @@ public class Board {
      */
     public static void initialize(int sz) throws InstanceAlreadyExistsException {
         if (instance != null) {
-            throw new InstanceAlreadyExistsException();
+            throw new InstanceAlreadyExistsException("initialize() called after Board has been initialized.");
         }
         else {
             instance = new Board(sz);
@@ -71,7 +79,7 @@ public class Board {
      */
     public static Board getInstance() throws InstanceNotFoundException {
         if (instance == null) {
-            throw new InstanceNotFoundException();
+            throw new InstanceNotFoundException("getInstance() called before Board has been initialized.");
         }
         else {
             return instance;
@@ -107,9 +115,53 @@ public class Board {
         this.squares[row][col].place(stone);
     }
 
-    public boolean isValidMove(Stone stone, int row, int col) {
-        // stub for now
-        return false;
+    /**
+     * Returns all directions where there would be at least one stone
+     * that will be flipped upon placing the stone on the square.
+     *
+     * @param stone The stone to be placed.
+     * @param row The row of the square to place the stone at.
+     * @param col The column of the square to place the stone at.
+     * @return The directions where there will be stones flipped. May be empty.
+     */
+    public Direction[] getFlippingDirections(Stone stone, int row, int col) {
+        List<Direction> resultList = new ArrayList<>();
+        Direction dir = Direction.TOP;
+        do {
+            boolean addThis = false;
+            int[] coor = dir.moveThisWay(row, col);
+            // must be within the board and not empty
+            // must have at least one stone of opposite color, then one of same color
+            boolean oppositeSeen = false;
+            while (coor != null && this.squares[coor[0]][coor[1]].getStone() != null) {
+                Stone stoneAtSquare = this.squares[coor[0]][coor[1]].getStone();
+                if (!oppositeSeen && stone.equals(stoneAtSquare.getOpposite())) {
+                    // first time seeing the opposite stone; must occur in the first iteration
+                    oppositeSeen = true;
+                }
+                else if (!oppositeSeen && stone.equals(stoneAtSquare)) {
+                    // saw the same stone without seeing an opposite stone; must occur in the first iteration
+                    break;
+                }
+                else if (oppositeSeen && stone.equals(stoneAtSquare)) {
+                    // saw the same stone after seeing opposite stone(s)
+                    addThis = true;
+                    break;
+                }
+                coor = dir.moveThisWay(coor[0], coor[1]);
+            }
+            if (addThis) {
+                resultList.add(dir);
+            }
+            dir = dir.clockwise();
+        } while (!dir.equals(Direction.TOP));
+
+        // put them in an array
+        Direction[] result = new Direction[resultList.size()];
+        for (int i = 0; i < resultList.size(); i++) {
+            result[i] = resultList.get(i);
+        }
+        return result;
     }
 
     public void flipAt(int row, int col) {
@@ -120,8 +172,30 @@ public class Board {
         // stub for now
     }
 
-    public SquarePanel getAdjacent(Direction direction) {
-        // stub for now
-        return new SquarePanel();
+    /**
+     * Returns the SquarePanel that is adjacent to a SquarePanel in the specified direction.
+     *
+     * @param row The row of the panel to start off of.
+     * @param col The column of the panel to start off of.
+     * @param dir The direction to move towards.
+     * @return The adjacent SquarePanel in the direction, {@code null} if it is out of board.
+     */
+    public SquarePanel getAdjacent(int row, int col, Direction dir) {
+        int[] result = dir.moveThisWay(row, col);
+        if (result != null) {
+            return this.squares[row][col];
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the stone of the player of the current turn.
+     *
+     * @return The stone to be placed this turn.
+     */
+    public Stone getTurn() {
+        return this.turn;
     }
 }

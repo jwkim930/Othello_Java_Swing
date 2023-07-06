@@ -1,5 +1,7 @@
 package backend;
 
+import javax.management.InstanceNotFoundException;
+
 /**
  * Represents a direction. There are 8 directions in total.
  * Use the constants to access each.
@@ -70,7 +72,7 @@ public class Direction {
 
     /**
      * Returns the direction that points to 45 degrees clockwise from the current direction.
-     * That is, calling it on "Top" direction gives a "Top-right" direction.
+     * For example, calling it on "Top" direction gives a "Top-right" direction.
      *
      * @return The new direction as indicated above.
      */
@@ -81,7 +83,7 @@ public class Direction {
 
     /**
      * Returns the direction that points to 45 degrees counter-clockwise from the current direction.
-     * That is, calling it on "Top" direction gives a "Top-left" direction.
+     * For example, calling it on "Top" direction gives a "Top-left" direction.
      *
      * @return The new direction as indicated above.
      */
@@ -118,5 +120,39 @@ public class Direction {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    /**
+     * Returns the coordinate of the square you'd end up
+     * by moving in the direction.
+     *
+     * @param startRow The row of the starting square.
+     * @param startCol The column of the starting square.
+     * @return The destination square. Contains 2 elements as [row, col].
+     * {@code null} if out of the board.
+     */
+    public int[] moveThisWay(int startRow, int startCol) {
+        int boardSize;
+        try {
+            boardSize = Board.getInstance().getSize();
+        } catch (InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        switch (this.tracker) {
+            case 1 -> startRow--;
+            case 2 -> {startRow--; startCol++;}
+            case 3 -> startCol++;
+            case 4 -> {startRow++; startCol++;}
+            case 5 -> startRow++;
+            case 6 -> {startRow++; startCol--;}
+            case 7 -> startCol--;
+            case 8 -> {startRow--; startCol--;}
+        }
+        if (startRow >= 0 && startRow < boardSize && startCol >= 0 && startCol < boardSize) {
+            return new int[] {startRow, startCol};
+        }
+        else {
+            return null;
+        }
     }
 }

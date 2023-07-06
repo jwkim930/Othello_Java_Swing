@@ -3,6 +3,7 @@ package gui;
 import backend.Board;
 import backend.Stone;
 
+import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,10 +12,6 @@ public class GameFrame extends JFrame implements Rebuildable {
      * The panel containing the board.
      */
     private BoardPanel boardPanel;
-    /**
-     * The player of the current turn. Black takes the first turn, then it alternates.
-     */
-    private Stone turn;
     /**
      * Shows the player to move the next move.
      */
@@ -49,9 +46,6 @@ public class GameFrame extends JFrame implements Rebuildable {
     public GameFrame(int boardSize) {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
-        // first turn is black
-        this.turn = Stone.BLACK;
-
         // add an empty space above
         this.add(Box.createRigidArea(new Dimension(0, 30)));
 
@@ -72,7 +66,13 @@ public class GameFrame extends JFrame implements Rebuildable {
             @Override
             public void paintComponent(Graphics g) {
                 // draw a circle of the right color
-                g.setColor(turn.getColor());
+                Board board;
+                try {
+                    board = Board.getInstance();
+                } catch (InstanceNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                g.setColor(board.getTurn().getColor());
                 g.fillOval(5, 5, 20, 20);
                 g.setColor(Color.BLACK);
                 g.drawOval(5, 5, 20, 20);
