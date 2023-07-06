@@ -95,12 +95,23 @@ public class SquarePanel extends JPanel implements Rebuildable {
         else {
             this.stone = stone;
             this.removeMouseListener(LISTENER);
+            this.setBackgroundColor(Color.LIGHT_GRAY);
             this.rebuild();
         }
     }
 
+    /**
+     * Replaces the stone on this square with the opposite stone.
+     * @throws IllegalStateException If there is no stone on the square.
+     */
     public void flip() {
-        // stub for now
+        if (this.stone == null) {
+            throw new IllegalStateException("No stone exists on this square.");
+        }
+        else {
+            this.stone = this.stone.getOpposite();
+            this.rebuild();
+        }
     }
 
     /**

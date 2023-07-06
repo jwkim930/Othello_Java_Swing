@@ -88,11 +88,23 @@ public class Board {
 
     /**
      * Get the 2D array of square cells in the board.
+     * Refrain from using this, and use getSquareAt() whenever possible.
      *
      * @return The array of square cells in the board.
      */
     public SquarePanel[][] getSquares() {
         return this.squares;
+    }
+
+    /**
+     * Return the SquarePanel at the coordinate.
+     *
+     * @param row The row of the coordinate.
+     * @param col The column of the coordinate.
+     * @return The SquarePanel at the coordinate.
+     */
+    public SquarePanel getSquareAt(int row, int col) {
+        return this.squares[row][col];
     }
 
     /**
@@ -164,8 +176,14 @@ public class Board {
         return result;
     }
 
+    /**
+     * Flips the stone at the coordinate.
+     *
+     * @param row The row of the square.
+     * @param col The column of the square.
+     */
     public void flipAt(int row, int col) {
-        // stub for now
+        this.squares[row][col].flip();
     }
 
     public void finish() {
@@ -183,7 +201,7 @@ public class Board {
     public SquarePanel getAdjacent(int row, int col, Direction dir) {
         int[] result = dir.moveThisWay(row, col);
         if (result != null) {
-            return this.squares[row][col];
+            return this.squares[result[0]][result[1]];
         }
         else {
             return null;
@@ -197,5 +215,13 @@ public class Board {
      */
     public Stone getTurn() {
         return this.turn;
+    }
+
+    /**
+     * Let the other player make the move.
+     * Should only be called by GameFrame, otherwise call nextTurn() in GameFrame.
+     */
+    public void nextTurn() {
+        this.turn = this.turn.getOpposite();
     }
 }

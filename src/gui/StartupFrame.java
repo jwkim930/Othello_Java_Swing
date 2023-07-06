@@ -1,5 +1,7 @@
 package gui;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
@@ -71,7 +73,13 @@ public class StartupFrame extends JFrame {
      * @param size The size of the game board.
      */
     public void startGame(int size) {
-        JFrame frame = new GameFrame(size);
+        JFrame frame;
+        try {
+            GameFrame.initialize(size);
+            frame = GameFrame.getInstance();
+        } catch (InstanceAlreadyExistsException | InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
         // place window in the middle of the screen

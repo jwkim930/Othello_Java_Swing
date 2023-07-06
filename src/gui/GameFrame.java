@@ -1,33 +1,34 @@
 package gui;
 
 import backend.Board;
-import backend.Stone;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The main window showing the game.
+ * This class uses a singleton pattern. Use initialize() in the beginning
+ * and getInstance() to access it.
+ */
 public class GameFrame extends JFrame implements Rebuildable {
+    /**
+     * The singleton instance of the object.
+     */
+    private static GameFrame instance;
     /**
      * The panel containing the board.
      */
     private BoardPanel boardPanel;
     /**
+     * Contains all the turn indicator and the two buttons.
+     */
+    private JPanel bottomRowPanel;
+    /**
      * Shows the player to move the next move.
      */
     private JPanel turnIndicatorCircle;
-    /**
-     * When pressed, skip the turn.
-     */
-    private JButton skipButton;
-    /**
-     * When pressed, finishes the game and finds the winner.
-     */
-    private JButton finishButton;
-    /**
-     * Marks if the game is still being played. Set to false when it is finished.
-     */
-    private boolean playing;
     /**
      * The width of the window in pixels.
      */
@@ -38,12 +39,43 @@ public class GameFrame extends JFrame implements Rebuildable {
     public final static int SIZE_Y = 800;
 
     /**
+     * Initializes the singleton instance of the game window.
+     * This should be called only once in the beginning.
+     *
+     * @param boardSize The size of the game board.
+     * @throws InstanceAlreadyExistsException If it has already been initialized.
+     */
+    public static void initialize(int boardSize) throws InstanceAlreadyExistsException {
+        if (instance != null) {
+            throw new InstanceAlreadyExistsException("The GameFrame has already been initialized.");
+        }
+        else {
+            instance = new GameFrame(boardSize);
+        }
+    }
+
+    /**
+     * Returns the singleton instance of the game window.
+     *
+     * @return The singleton instance of the game window.
+     * @throws InstanceNotFoundException If it hasn't been initialized yet.
+     */
+    public static GameFrame getInstance() throws InstanceNotFoundException {
+        if (instance == null) {
+            throw new InstanceNotFoundException("The GameFrame has not been initialized yet.");
+        }
+        else {
+            return instance;
+        }
+    }
+
+    /**
      * Initializes the game window. This should be called only once
      * in the beginning.
      *
      * @param boardSize The size of the game board.
      */
-    public GameFrame(int boardSize) {
+    private GameFrame(int boardSize) {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
         // add an empty space above
@@ -56,12 +88,7 @@ public class GameFrame extends JFrame implements Rebuildable {
         // add an empty space below
         this.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // design turn indicator
-        JPanel turnIndicator = new JPanel();
-        turnIndicator.setLayout(new BoxLayout(turnIndicator, BoxLayout.LINE_AXIS));
-        JLabel turnLabel = new JLabel("Current turn:");
-        turnLabel.setFont(new Font(turnLabel.getFont().getName(), Font.PLAIN, turnLabel.getFont().getSize() * 2));
-        turnIndicator.add(turnLabel);
+        // design turn indicator circle
         this.turnIndicatorCircle = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -83,32 +110,50 @@ public class GameFrame extends JFrame implements Rebuildable {
         this.turnIndicatorCircle.setPreferredSize(circleSizeDimension);
         this.turnIndicatorCircle.setMinimumSize(circleSizeDimension);
         this.turnIndicatorCircle.setMaximumSize(circleSizeDimension);
+
+        // build and add bottom row
+        this.bottomRowPanel = new JPanel();
+        rebuild();
+        this.add(bottomRowPanel);
+    }
+
+    public void rebuild() {
+        // only the turn indicator need to be updated
+        // update the entire bottom row for this
+        this.bottomRowPanel.removeAll();
+
+        // design the turn indicator
+        JPanel turnIndicator = new JPanel();
+        turnIndicator.setLayout(new BoxLayout(turnIndicator, BoxLayout.LINE_AXIS));
+        JLabel turnLabel = new JLabel("Current turn:");
+        turnLabel.setFont(new Font(turnLabel.getFont().getName(), Font.PLAIN, turnLabel.getFont().getSize() * 2));
+        turnIndicator.add(turnLabel);
         turnIndicator.add(this.turnIndicatorCircle);
 
         // design skip and finish button
         Dimension buttonDimension = new Dimension(0, 35);
-        this.skipButton = new JButton("Skip");
-        this.skipButton.setSize(buttonDimension);
-        this.skipButton.setPreferredSize(buttonDimension);
-        this.skipButton.setMinimumSize(buttonDimension);
-        this.skipButton.addActionListener(event -> this.nextTurn());
 
-        this.finishButton = new JButton("Finish");
-        this.finishButton.setSize(buttonDimension);
-        this.finishButton.setPreferredSize(buttonDimension);
-        this.finishButton.setMinimumSize(buttonDimension);
-        this.finishButton.setMinimumSize(buttonDimension);
-        this.finishButton.addActionListener(event -> this.playing = false);
+        JButton skipButton = new JButton("Skip");
+        skipButton.setSize(buttonDimension);
+        skipButton.setPreferredSize(buttonDimension);
+        skipButton.setMinimumSize(buttonDimension);
+        skipButton.addActionListener(event -> this.nextTurn());
 
-        // add the bottom row
-        JPanel bottomRowPanel = new JPanel();
-        GroupLayout bottomRowLayout = new GroupLayout(bottomRowPanel);
-        bottomRowPanel.setLayout(bottomRowLayout);
+        JButton finishButton = new JButton("Finish");
+        finishButton.setSize(buttonDimension);
+        finishButton.setPreferredSize(buttonDimension);
+        finishButton.setMinimumSize(buttonDimension);
+        finishButton.setMinimumSize(buttonDimension);
+        finishButton.addActionListener(event -> finishGame());
+
+        // assemble the bottom row
+        GroupLayout bottomRowLayout = new GroupLayout(this.bottomRowPanel);
+        this.bottomRowPanel.setLayout(bottomRowLayout);
         bottomRowLayout.setHorizontalGroup(bottomRowLayout.createSequentialGroup()
                 .addGap(270)
                 .addComponent(turnIndicator).addGap(150)
-                .addComponent(this.skipButton).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(this.finishButton)
+                .addComponent(skipButton).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(finishButton)
         );
         bottomRowLayout.setVerticalGroup(bottomRowLayout.createSequentialGroup()
                 .addGroup(bottomRowLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -117,20 +162,24 @@ public class GameFrame extends JFrame implements Rebuildable {
                         .addComponent(finishButton)
                 )
         );
-        this.add(bottomRowPanel);
-
-        this.playGame();
     }
 
-    public void rebuild() {
-        this.turnIndicatorCircle.repaint();
+    /**
+     * Finish this turn and let the other player make their move.
+     * This also refreshes the turn indicator.
+     */
+    public void nextTurn() {
+        Board board;
+        try {
+            board = Board.getInstance();
+        } catch (InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        board.nextTurn();
+        this.rebuild();
     }
 
-    private void playGame() {
-        // stub for now
-    }
-
-    private void nextTurn() {
+    private void finishGame() {
         // stub for now
     }
 }
