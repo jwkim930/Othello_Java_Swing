@@ -1,6 +1,5 @@
 package backend;
 
-import gui.GameFrame;
 import gui.SquarePanel;
 
 import javax.management.InstanceNotFoundException;
@@ -8,6 +7,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+/**
+ * MouseListener used for SquarePanel. Makes the squares user-interactable.
+ */
 public class SquareMouseListener implements MouseListener {
     /**
      * Invoked when the mouse button has been clicked (pressed
@@ -49,27 +51,8 @@ public class SquareMouseListener implements MouseListener {
         }
         SquarePanel square = (SquarePanel) e.getSource();
         int row = square.getCoordinate()[0], col = square.getCoordinate()[1];
-        Stone stone = board.getTurn();
-        Direction[] flippableDirections = board.getFlippingDirections(stone, row, col);
-        if (flippableDirections.length == 0) {
+        if (!board.placeStone(row, col)) {
             square.invalidMoveFlash();
-        }
-        else {
-            // place stone and flip appropriately
-            board.placeStone(stone, row, col);
-            for (Direction dir : flippableDirections) {
-                // getFlippingDirections() already ensures all stones in the direction are flippable
-                for (int[] coor = dir.moveThisWay(row, col);
-                  board.getSquareAt(coor[0], coor[1]).getStone().equals(stone.getOpposite());
-                  coor = dir.moveThisWay(coor[0], coor[1])) {
-                    board.flipAt(coor[0], coor[1]);
-                }
-            }
-            try {
-                GameFrame.getInstance().nextTurn();
-            } catch (InstanceNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
         }
     }
 

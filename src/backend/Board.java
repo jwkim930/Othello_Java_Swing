@@ -1,6 +1,7 @@
 package backend;
 
 import gui.BoardPanel;
+import gui.GameFrame;
 import gui.SquarePanel;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -48,10 +49,10 @@ public class Board {
         }
         // place the 4 starting stones
         int topLeft = size / 2 - 1;
-        this.placeStone(Stone.WHITE, topLeft, topLeft);
-        this.placeStone(Stone.BLACK, topLeft, topLeft + 1);
-        this.placeStone(Stone.BLACK, topLeft + 1, topLeft);
-        this.placeStone(Stone.WHITE, topLeft + 1, topLeft + 1);
+        this.getSquareAt(topLeft, topLeft).place(Stone.WHITE);
+        this.getSquareAt(topLeft, topLeft + 1).place(Stone.BLACK);
+        this.getSquareAt(topLeft + 1, topLeft).place(Stone.BLACK);
+        this.getSquareAt(topLeft + 1, topLeft + 1).place(Stone.WHITE);
         // the first turn is black
         this.turn = Stone.BLACK;
     }
@@ -97,14 +98,20 @@ public class Board {
     }
 
     /**
-     * Return the SquarePanel at the coordinate.
+     * Return the SquarePanel at the coordinate. Returns {@code null} if the
+     * given coordinate is outside the board.
      *
      * @param row The row of the coordinate.
      * @param col The column of the coordinate.
-     * @return The SquarePanel at the coordinate.
+     * @return The SquarePanel at the coordinate. {@code null} if the coordinate is
+     * outside the board.
      */
     public SquarePanel getSquareAt(int row, int col) {
-        return this.squares[row][col];
+        try {
+            return this.squares[row][col];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     /**
@@ -117,14 +124,38 @@ public class Board {
     }
 
     /**
-     * Places the stone in the given coordinate.
+     * Attempts to place the stone for the current turn on the given coordinate.
+     * If it is a valid move, the stone is placed and the appropriate stones are flipped,
+     * then the other player takes turn. If it is not a valid move, nothing happens on the board.
      *
-     * @param stone The stone to be placed.
      * @param row The row that the square to place the stone on is in.
      * @param col The column that the square to place the stone on is in.
+     * @return {@code true} if it's a valid move, {@code false} otherwise.
      */
-    public void placeStone(Stone stone, int row, int col) {
-        this.squares[row][col].place(stone);
+    public boolean placeStone(int row, int col) {
+        Stone stone = this.getTurn();
+        Direction[] flippableDirections = this.getFlippingDirections(stone, row, col);
+        if (flippableDirections.length == 0) {
+            return false;
+        }
+        else {
+            // place stone and flip appropriately
+            this.getSquareAt(row, col).place(stone);
+            for (Direction dir : flippableDirections) {
+                // getFlippingDirections() already ensures all stones in the direction are flippable
+                for (SquarePanel square = this.getSquareAt(row, col).getAdjacent(dir);
+                  square.getStone().equals(stone.getOpposite());
+                  square = square.getAdjacent(dir)) {
+                    square.flip();
+                }
+            }
+            try {
+                GameFrame.getInstance().nextTurn();
+            } catch (InstanceNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+            return true;
+        }
     }
 
     /**
@@ -141,12 +172,12 @@ public class Board {
         Direction dir = Direction.TOP;
         do {
             boolean addThis = false;
-            int[] coor = dir.moveThisWay(row, col);
+            SquarePanel square = this.getSquareAt(row, col).getAdjacent(dir);
             // must be within the board and not empty
             // must have at least one stone of opposite color, then one of same color
             boolean oppositeSeen = false;
-            while (coor != null && this.squares[coor[0]][coor[1]].getStone() != null) {
-                Stone stoneAtSquare = this.squares[coor[0]][coor[1]].getStone();
+            while (square != null && square.getStone() != null) {
+                Stone stoneAtSquare = square.getStone();
                 if (!oppositeSeen && stone.equals(stoneAtSquare.getOpposite())) {
                     // first time seeing the opposite stone; must occur in the first iteration
                     oppositeSeen = true;
@@ -160,7 +191,7 @@ public class Board {
                     addThis = true;
                     break;
                 }
-                coor = dir.moveThisWay(coor[0], coor[1]);
+                square = square.getAdjacent(dir);
             }
             if (addThis) {
                 resultList.add(dir);
@@ -174,38 +205,6 @@ public class Board {
             result[i] = resultList.get(i);
         }
         return result;
-    }
-
-    /**
-     * Flips the stone at the coordinate.
-     *
-     * @param row The row of the square.
-     * @param col The column of the square.
-     */
-    public void flipAt(int row, int col) {
-        this.squares[row][col].flip();
-    }
-
-    public void finish() {
-        // stub for now
-    }
-
-    /**
-     * Returns the SquarePanel that is adjacent to a SquarePanel in the specified direction.
-     *
-     * @param row The row of the panel to start off of.
-     * @param col The column of the panel to start off of.
-     * @param dir The direction to move towards.
-     * @return The adjacent SquarePanel in the direction, {@code null} if it is out of board.
-     */
-    public SquarePanel getAdjacent(int row, int col, Direction dir) {
-        int[] result = dir.moveThisWay(row, col);
-        if (result != null) {
-            return this.squares[result[0]][result[1]];
-        }
-        else {
-            return null;
-        }
     }
 
     /**

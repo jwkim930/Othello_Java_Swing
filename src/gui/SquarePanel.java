@@ -1,11 +1,19 @@
 package gui;
 
+import backend.Board;
+import backend.Direction;
 import backend.SquareMouseListener;
 import backend.Stone;
 
+import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * An interactable panel that represents a square on the board.
+ * May contain a stone. It is no longer (directly) interactable
+ * if there is a stone.
+ */
 public class SquarePanel extends JPanel implements Rebuildable {
     /**
      * The stone on this square. {@code null} if there is no stone.
@@ -188,5 +196,28 @@ public class SquarePanel extends JPanel implements Rebuildable {
      */
     public int[] getCoordinate() {
         return this.coordinate;
+    }
+
+    /**
+     * Returns the SquarePanel that is adjacent to this SquarePanel in the specified direction.
+     *
+     * @param dir The direction to move towards.
+     * @return The adjacent SquarePanel in the direction, {@code null} if it is out of board.
+     */
+    public SquarePanel getAdjacent(Direction dir) {
+        int row = this.coordinate[0], col = this.coordinate[1];
+        int[] result = dir.moveThisWay(row, col);
+        Board board;
+        try {
+            board = Board.getInstance();
+        } catch (InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        if (result != null) {
+            return board.getSquareAt(result[0], result[1]);
+        }
+        else {
+            return null;
+        }
     }
 }

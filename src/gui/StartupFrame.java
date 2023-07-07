@@ -5,11 +5,23 @@ import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
-import backend.Board;
-
+/**
+ * A window responsible for the initial setup. The board size is
+ * determined in this window.
+ */
 public class StartupFrame extends JFrame {
+    /**
+     * A {@code Component} that displays the title text.
+     */
     private JLabel title;
+    /**
+     * A {@code Component} that displays the slider used to configure
+     * the board size.
+     */
     private JPanel sizeSliderPanel;
+    /**
+     * A {@code Component} that initializes the board upon being pressed.
+     */
     private JButton startButton;
     /** The horizontal size of the window in pixels */
     public final static int SIZE_X = 400;
@@ -22,6 +34,9 @@ public class StartupFrame extends JFrame {
     /** Default board size */
     private final static int SIZE_INITIAL = 8;
 
+    /**
+     * Initializes the startup window.
+     */
     public StartupFrame() {
         super("Othello");
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
