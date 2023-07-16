@@ -1,6 +1,7 @@
 package gui;
 
 import backend.Board;
+import backend.Stone;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -55,6 +56,13 @@ public class GameFrame extends JFrame implements Rebuildable {
     }
 
     /**
+     * Removes the singleton instance of this object so that it can be initialized again.
+     */
+    public static void reset() {
+        instance = null;
+    }
+
+    /**
      * Returns the singleton instance of the game window.
      *
      * @return The singleton instance of the game window.
@@ -89,32 +97,18 @@ public class GameFrame extends JFrame implements Rebuildable {
         this.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // design turn indicator circle
-        this.turnIndicatorCircle = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                // draw a circle of the right color
-                Board board;
-                try {
-                    board = Board.getInstance();
-                } catch (InstanceNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-                g.setColor(board.getTurn().getColor());
-                g.fillOval(5, 5, 20, 20);
-                g.setColor(Color.BLACK);
-                g.drawOval(5, 5, 20, 20);
-            }
-        };
-        Dimension circleSizeDimension = new Dimension(30, 30);
-        this.turnIndicatorCircle.setSize(circleSizeDimension);
-        this.turnIndicatorCircle.setPreferredSize(circleSizeDimension);
-        this.turnIndicatorCircle.setMinimumSize(circleSizeDimension);
-        this.turnIndicatorCircle.setMaximumSize(circleSizeDimension);
+        Board board;
+        try {
+            board = Board.getInstance();
+        } catch (InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        this.turnIndicatorCircle = this.createIndicatorCircle(board.getTurn());
 
         // build and add bottom row
         this.bottomRowPanel = new JPanel();
-        rebuild();
-        this.add(bottomRowPanel);
+        this.rebuild();
+        this.add(this.bottomRowPanel);
     }
 
     public void rebuild() {
@@ -176,10 +170,139 @@ public class GameFrame extends JFrame implements Rebuildable {
             throw new RuntimeException(e);
         }
         board.nextTurn();
+        this.turnIndicatorCircle = this.createIndicatorCircle(board.getTurn());
         this.rebuild();
     }
 
+    /**
+     * Finishes the game, blocking access to the board and determining the winner.
+     */
     private void finishGame() {
-        // stub for now
+        Board board;
+        try {
+            board = Board.getInstance();
+        } catch (InstanceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        // disable board panel and determine winner
+        Stone winner;
+        int whiteWinningCount = 0;
+        for (int row = 0; row < board.getSize(); row++) {
+            for (int col = 0; col < board.getSize(); col++) {
+                SquarePanel square = board.getSquareAt(row, col);
+                square.setBackgroundColor(Color.GRAY);
+                if (square.getStone() == null) {
+                    square.removeMouseListener(square.getMouseListeners()[0]);
+                }
+                else if (square.getStone().equals(Stone.WHITE)) {
+                    whiteWinningCount++;
+                }
+                else {
+                    whiteWinningCount--;
+                }
+            }
+        }
+        if (whiteWinningCount > 0) {
+            winner = Stone.WHITE;
+        }
+        else if (whiteWinningCount < 0) {
+            winner = Stone.BLACK;
+        }
+        else {
+            winner = null;
+        }
+
+        this.bottomRowPanel.removeAll();
+        // design the winner indicator
+        JPanel winnerIndicator = new JPanel();
+        winnerIndicator.setLayout(new BoxLayout(winnerIndicator, BoxLayout.LINE_AXIS));
+        JLabel winnerLabel = new JLabel();
+        winnerLabel.setFont(new Font(winnerLabel.getFont().getName(), Font.PLAIN, winnerLabel.getFont().getSize() * 2));
+        if (winner == null) {
+            // it's a draw
+            winnerLabel.setText("The game is a draw!");
+        }
+        else {
+            // someone won
+            winnerIndicator.add(this.createIndicatorCircle(winner));
+            winnerLabel.setText(" won the game!");
+        }
+        winnerIndicator.add(winnerLabel);
+
+        // design the restart and exit buttons
+        Dimension buttonDimension = new Dimension(0, 35);
+
+        JButton restartButton = new JButton("Restart");
+        restartButton.setSize(buttonDimension);
+        restartButton.setPreferredSize(buttonDimension);
+        restartButton.setMinimumSize(buttonDimension);
+        restartButton.addActionListener(event -> this.restart());
+
+        JButton exitButton = new JButton("Exit");
+        exitButton.setSize(buttonDimension);
+        exitButton.setPreferredSize(buttonDimension);
+        exitButton.setMinimumSize(buttonDimension);
+        exitButton.setMinimumSize(buttonDimension);
+        exitButton.addActionListener(event -> this.dispose());
+
+        // assemble the bottom row
+        GroupLayout bottomRowLayout = new GroupLayout(this.bottomRowPanel);
+        this.bottomRowPanel.setLayout(bottomRowLayout);
+        bottomRowLayout.setHorizontalGroup(bottomRowLayout.createSequentialGroup()
+                .addGap(270)
+                .addComponent(winnerIndicator).addGap(93)
+                .addComponent(restartButton).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(exitButton)
+        );
+        bottomRowLayout.setVerticalGroup(bottomRowLayout.createSequentialGroup()
+                .addGroup(bottomRowLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(winnerIndicator)
+                        .addComponent(restartButton)
+                        .addComponent(exitButton)
+                )
+        );
+
+    }
+
+    /**
+     * Creates a panel that shows a circle indicating the current turn.
+     *
+     * @param stone The stone of the current turn.
+     * @return The JPanel that shows the circle.
+     */
+    private JPanel createIndicatorCircle(Stone stone) {
+        JPanel result = new JPanel() {
+            @Override
+            public void paintComponent(Graphics g) {
+                // draw a circle of the right color
+                g.setColor(stone.getColor());
+                g.fillOval(5, 5, 20, 20);
+                g.setColor(Color.BLACK);
+                g.drawOval(5, 5, 20, 20);
+            }
+        };
+        Dimension circleSizeDimension = new Dimension(30, 30);
+        result.setSize(circleSizeDimension);
+        result.setPreferredSize(circleSizeDimension);
+        result.setMinimumSize(circleSizeDimension);
+        result.setMaximumSize(circleSizeDimension);
+
+        return result;
+    }
+
+    /**
+     * Restarts the game, opening up the initial setup window and closing this one.
+     */
+    private void restart() {
+        GameFrame.reset();
+        Board.reset();
+        SquarePanel.resetSquareSize();
+        JFrame frame = new StartupFrame();
+        frame.setSize(StartupFrame.SIZE_X, StartupFrame.SIZE_Y);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        this.dispose();
     }
 }

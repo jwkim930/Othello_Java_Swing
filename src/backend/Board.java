@@ -73,6 +73,13 @@ public class Board {
     }
 
     /**
+     * Removes the singleton instance of this object so that it can be initialized again.
+     */
+    public static void reset() {
+        instance = null;
+    }
+
+    /**
      * Returns the singleton instance of the board.
      *
      * @return The instance of the board.

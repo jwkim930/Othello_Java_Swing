@@ -29,11 +29,6 @@ public class SquarePanel extends JPanel implements Rebuildable {
      */
     private Color backgroundColor;
     /**
-     * The mouse listener to be associated with this square.
-     * Added upon creation, removed upon placing a stone.
-     */
-    private static final SquareMouseListener LISTENER = new SquareMouseListener();
-    /**
      * The coordinate of this square on the board. Uses the format [row, col].
      */
     private int[] coordinate;
@@ -52,7 +47,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
         this.setPreferredSize(sizeDimension);
         this.setMinimumSize(sizeDimension);
         this.setMaximumSize(sizeDimension);
-        this.addMouseListener(LISTENER);
+        this.addMouseListener(new SquareMouseListener());
         this.backgroundColor = Color.LIGHT_GRAY;
         this.coordinate = new int[] {row, col};
     }
@@ -102,9 +97,8 @@ public class SquarePanel extends JPanel implements Rebuildable {
         }
         else {
             this.stone = stone;
-            this.removeMouseListener(LISTENER);
+            this.removeMouseListener(this.getMouseListeners()[0]);
             this.setBackgroundColor(Color.LIGHT_GRAY);
-            this.rebuild();
         }
     }
 
@@ -153,6 +147,13 @@ public class SquarePanel extends JPanel implements Rebuildable {
     }
 
     /**
+     * Unsets the square size so that it can be set again.
+     */
+    public static void resetSquareSize() {
+        squareSize = -1;
+    }
+
+    /**
      * Gets the current background color of this square.
      *
      * @return The background color of this square.
@@ -163,12 +164,13 @@ public class SquarePanel extends JPanel implements Rebuildable {
 
     /**
      * Sets the background color of this square.
-     * This method does not repaint the square.
+     * This also redraws the square to show the new color.
      *
      * @param color The color to be used as the background.
      */
     public void setBackgroundColor(Color color) {
         this.backgroundColor = color;
+        this.rebuild();
     }
 
     /**
@@ -176,7 +178,6 @@ public class SquarePanel extends JPanel implements Rebuildable {
      */
     public void invalidMoveFlash() {
         setBackgroundColor(new Color(230, 69, 69));
-        this.rebuild();
         Thread setColorBack = new Thread(() -> {
             try {
                 Thread.sleep(200);
@@ -184,7 +185,6 @@ public class SquarePanel extends JPanel implements Rebuildable {
                 throw new RuntimeException(e);
             }
             this.setBackgroundColor(Color.LIGHT_GRAY);
-            this.rebuild();
         });
         setColorBack.start();
     }
