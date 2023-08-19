@@ -27,7 +27,7 @@ public class GameFrame extends JFrame implements Rebuildable {
      */
     private JPanel bottomRowPanel;
     /**
-     * Shows the player to move the next move.
+     * Shows the player to make the next move.
      */
     private JPanel turnIndicatorCircle;
     /**
@@ -38,19 +38,25 @@ public class GameFrame extends JFrame implements Rebuildable {
      * The height of the window in pixels.
      */
     public final static int SIZE_Y = 800;
+    /**
+     * {@code true} if debug mode is enabled.
+     */
+    private static boolean debug;
 
     /**
      * Initializes the singleton instance of the game window.
      * This should be called only once in the beginning.
      *
      * @param boardSize The size of the game board.
+     * @param dbg       If {@code true}, debug mode is enabled.
      * @throws InstanceAlreadyExistsException If it has already been initialized.
      */
-    public static void initialize(int boardSize) throws InstanceAlreadyExistsException {
+    public static void initialize(int boardSize, boolean dbg) throws InstanceAlreadyExistsException {
         if (instance != null) {
             throw new InstanceAlreadyExistsException("The GameFrame has already been initialized.");
         }
         else {
+            debug = dbg;
             instance = new GameFrame(boardSize);
         }
     }
@@ -304,5 +310,14 @@ public class GameFrame extends JFrame implements Rebuildable {
         frame.setResizable(false);
         frame.setVisible(true);
         this.dispose();
+    }
+
+    /**
+     * Tells whether debug mode is enabled or not.
+     *
+     * @return {@code true} if debug mode is enabled, and {@code false} otherwise.
+     */
+    public static boolean isDebugMode() {
+        return debug;
     }
 }

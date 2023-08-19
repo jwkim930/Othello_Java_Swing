@@ -79,7 +79,7 @@ public class SquareMouseListener implements MouseListener {
         Color squareColor = square.getBackgroundColor();
         if (squareColor.equals(Color.GRAY) || squareColor.equals(Color.DARK_GRAY)) {
             // square isn't flashing for invalid move
-            square.setBackgroundColor(Color.LIGHT_GRAY);
+            square.setBackgroundColor(SquarePanel.getDefaultBackgroundColor());
         }
     }
 }

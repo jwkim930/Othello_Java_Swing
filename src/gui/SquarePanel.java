@@ -9,6 +9,8 @@ import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
+import static gui.GameFrame.isDebugMode;
+
 /**
  * An interactable panel that represents a square on the board.
  * May contain a stone. It is no longer (directly) interactable
@@ -32,6 +34,11 @@ public class SquarePanel extends JPanel implements Rebuildable {
      * The coordinate of this square on the board. Uses the format [row, col].
      */
     private int[] coordinate;
+    /**
+     * The background color of the square when not interacting with anything.
+     * In regular game play, this is light gray. In debug mode, it's light green.
+     */
+    private static Color defaultBackgroundColor;
 
     /**
      * Initializes a SquarePanel. There is no stone on it initially.
@@ -48,7 +55,8 @@ public class SquarePanel extends JPanel implements Rebuildable {
         this.setMinimumSize(sizeDimension);
         this.setMaximumSize(sizeDimension);
         this.addMouseListener(new SquareMouseListener());
-        this.backgroundColor = Color.LIGHT_GRAY;
+        defaultBackgroundColor = isDebugMode() ? new Color(143, 204, 143) : Color.LIGHT_GRAY;
+        this.backgroundColor = defaultBackgroundColor;
         this.coordinate = new int[] {row, col};
     }
 
@@ -98,7 +106,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
         else {
             this.stone = stone;
             this.removeMouseListener(this.getMouseListeners()[0]);
-            this.setBackgroundColor(Color.LIGHT_GRAY);
+            this.setBackgroundColor(SquarePanel.defaultBackgroundColor);
         }
     }
 
@@ -184,7 +192,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            this.setBackgroundColor(Color.LIGHT_GRAY);
+            this.setBackgroundColor(SquarePanel.defaultBackgroundColor);
         });
         setColorBack.start();
     }
@@ -219,5 +227,15 @@ public class SquarePanel extends JPanel implements Rebuildable {
         else {
             return null;
         }
+    }
+
+    /**
+     * Returns the background color to be used when nothing happens to the square.
+     * That is, the mouse cursor hasn't entered the square, or it already has a stone inside.
+     *
+     * @return The default background color to be used.
+     */
+    public static Color getDefaultBackgroundColor() {
+        return defaultBackgroundColor;
     }
 }

@@ -1,5 +1,7 @@
 package gui;
 
+import backend.DebugMouseListener;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.swing.*;
@@ -33,6 +35,9 @@ public class StartupFrame extends JFrame {
     private final static int SIZE_MAX = 24;
     /** Default board size */
     private final static int SIZE_INITIAL = 8;
+    /** If {@code true}, debug mode is enabled.
+      * Click and hold the title text for three seconds to enable this. */
+    private boolean debug = false;
 
     /**
      * Initializes the startup window.
@@ -51,6 +56,8 @@ public class StartupFrame extends JFrame {
         this.title.setAlignmentX(0.5f);
         Font titleFont = new Font(this.title.getFont().getName(), Font.BOLD, this.title.getFont().getSize() * 4);
         this.title.setFont(titleFont);
+        // add debug mode listener
+        this.title.addMouseListener(new DebugMouseListener());
         this.add(this.title);
 
         // Empty space for spacing
@@ -90,7 +97,7 @@ public class StartupFrame extends JFrame {
     public void startGame(int size) {
         JFrame frame;
         try {
-            GameFrame.initialize(size);
+            GameFrame.initialize(size, this.debug);
             frame = GameFrame.getInstance();
         } catch (InstanceAlreadyExistsException | InstanceNotFoundException e) {
             throw new RuntimeException(e);
@@ -107,5 +114,14 @@ public class StartupFrame extends JFrame {
         this.setVisible(false);
         frame.setVisible(true);
         this.dispose();
+    }
+
+    /**
+     * Enables debug mode. This makes the title text green.
+     */
+    public void enableDebugMode() {
+        this.debug = true;
+        System.out.println("Debug mode is enabled.");
+        this.title.setForeground(Color.green);
     }
 }
