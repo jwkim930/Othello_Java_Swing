@@ -2,7 +2,6 @@ package backend;
 
 import gui.SquarePanel;
 
-import javax.management.InstanceNotFoundException;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -42,15 +41,9 @@ public class SquareMouseListener implements MouseListener {
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        Board board;
-        try {
-            board = Board.getInstance();
-        } catch (InstanceNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
         SquarePanel square = (SquarePanel) e.getSource();
         int row = square.getCoordinate()[0], col = square.getCoordinate()[1];
-        if (!board.placeStone(row, col)) {
+        if (!Board.getInstance().placeStone(row, col)) {
             square.invalidMoveFlash();
         }
     }

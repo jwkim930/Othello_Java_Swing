@@ -5,7 +5,6 @@ import backend.Direction;
 import backend.SquareMouseListener;
 import backend.Stone;
 
-import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
@@ -215,14 +214,8 @@ public class SquarePanel extends JPanel implements Rebuildable {
     public SquarePanel getAdjacent(Direction dir) {
         int row = this.coordinate[0], col = this.coordinate[1];
         int[] result = dir.moveThisWay(row, col);
-        Board board;
-        try {
-            board = Board.getInstance();
-        } catch (InstanceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         if (result != null) {
-            return board.getSquareAt(result[0], result[1]);
+            return Board.getInstance().getSquareAt(result[0], result[1]);
         }
         else {
             return null;

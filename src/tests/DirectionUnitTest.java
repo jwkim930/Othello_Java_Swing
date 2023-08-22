@@ -4,8 +4,6 @@ import backend.Board;
 import backend.Direction;
 import org.junit.jupiter.api.Test;
 
-import javax.management.InstanceAlreadyExistsException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DirectionUnitTest {
@@ -41,11 +39,7 @@ public class DirectionUnitTest {
 
     @Test
     public void testMover() {
-        try {
-            Board.initialize(8);
-        } catch (InstanceAlreadyExistsException e) {
-            throw new RuntimeException(e);
-        }
+        Board.initialize(8);
         // test in-bound
         int[] start = {2, 2};
         assertArrayEquals(new int[] {1, 2}, Direction.TOP.moveThisWay(start[0], start[1]));

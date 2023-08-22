@@ -1,7 +1,5 @@
 package backend;
 
-import javax.management.InstanceNotFoundException;
-
 /**
  * Represents a direction. There are 8 directions in total.
  * Use the constants to access each.
@@ -132,12 +130,7 @@ public class Direction {
      * {@code null} if out of the board.
      */
     public int[] moveThisWay(int startRow, int startCol) {
-        int boardSize;
-        try {
-            boardSize = Board.getInstance().getSize();
-        } catch (InstanceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        int boardSize = Board.getInstance().getSize();
         switch (this.tracker) {
             case 1 -> startRow--;
             case 2 -> {startRow--; startCol++;}

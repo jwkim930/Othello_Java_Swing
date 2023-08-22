@@ -1,10 +1,10 @@
 package gui;
 
 import backend.Board;
+import exceptions.SingletonAlreadyExistsException;
+import exceptions.SingletonNotYetExistsException;
 import backend.Stone;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 import java.awt.*;
 
@@ -15,7 +15,7 @@ import java.awt.*;
  */
 public class GameFrame extends JFrame implements Rebuildable {
     /**
-     * The singleton instance of the object.
+     * The singleton instance of this class.
      */
     private static GameFrame instance;
     /**
@@ -49,11 +49,11 @@ public class GameFrame extends JFrame implements Rebuildable {
      *
      * @param boardSize The size of the game board.
      * @param dbg       If {@code true}, debug mode is enabled.
-     * @throws InstanceAlreadyExistsException If it has already been initialized.
+     * @throws SingletonAlreadyExistsException If it has already been initialized.
      */
-    public static void initialize(int boardSize, boolean dbg) throws InstanceAlreadyExistsException {
+    public static void initialize(int boardSize, boolean dbg) throws SingletonAlreadyExistsException {
         if (instance != null) {
-            throw new InstanceAlreadyExistsException("The GameFrame has already been initialized.");
+            throw new SingletonAlreadyExistsException("The GameFrame has already been initialized.");
         }
         else {
             debug = dbg;
@@ -72,11 +72,11 @@ public class GameFrame extends JFrame implements Rebuildable {
      * Returns the singleton instance of the game window.
      *
      * @return The singleton instance of the game window.
-     * @throws InstanceNotFoundException If it hasn't been initialized yet.
+     * @throws SingletonNotYetExistsException If it hasn't been initialized yet.
      */
-    public static GameFrame getInstance() throws InstanceNotFoundException {
+    public static GameFrame getInstance() throws SingletonNotYetExistsException {
         if (instance == null) {
-            throw new InstanceNotFoundException("The GameFrame has not been initialized yet.");
+            throw new SingletonNotYetExistsException("The GameFrame has not been initialized yet.");
         }
         else {
             return instance;
@@ -103,13 +103,7 @@ public class GameFrame extends JFrame implements Rebuildable {
         this.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // design turn indicator circle
-        Board board;
-        try {
-            board = Board.getInstance();
-        } catch (InstanceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        this.turnIndicatorCircle = this.createIndicatorCircle(board.getTurn());
+        this.turnIndicatorCircle = this.createIndicatorCircle(Board.getInstance().getTurn());
 
         // build and add bottom row
         this.bottomRowPanel = new JPanel();
@@ -169,12 +163,7 @@ public class GameFrame extends JFrame implements Rebuildable {
      * This also refreshes the turn indicator.
      */
     public void nextTurn() {
-        Board board;
-        try {
-            board = Board.getInstance();
-        } catch (InstanceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Board board = Board.getInstance();
         board.nextTurn();
         this.turnIndicatorCircle = this.createIndicatorCircle(board.getTurn());
         this.rebuild();
@@ -184,12 +173,7 @@ public class GameFrame extends JFrame implements Rebuildable {
      * Finishes the game, blocking access to the board and determining the winner.
      */
     private void finishGame() {
-        Board board;
-        try {
-            board = Board.getInstance();
-        } catch (InstanceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        Board board = Board.getInstance();
 
         // disable board panel and determine winner
         Stone winner;
@@ -303,6 +287,9 @@ public class GameFrame extends JFrame implements Rebuildable {
     private void restart() {
         GameFrame.reset();
         Board.reset();
+        if (isDebugMode()) {
+            DebugFrame.reset();
+        }
         SquarePanel.resetSquareSize();
         JFrame frame = new StartupFrame();
         frame.setSize(StartupFrame.SIZE_X, StartupFrame.SIZE_Y);

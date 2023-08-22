@@ -1,7 +1,5 @@
 package gui;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
 import javax.swing.*;
 
 import backend.Board;
@@ -24,11 +22,7 @@ public class BoardPanel extends JPanel {
      */
     public BoardPanel(int boardSize) {
         super();
-        try {
-            Board.initialize(boardSize);
-        } catch (InstanceAlreadyExistsException e) {
-            throw new RuntimeException(e);
-        }
+        Board.initialize(boardSize);
         this.setLayout(new GridLayout(boardSize, boardSize));
         Dimension sizeDimension = new Dimension(SIZE, SIZE);
         this.setSize(sizeDimension);
@@ -36,11 +30,7 @@ public class BoardPanel extends JPanel {
         this.setMinimumSize(sizeDimension);
         this.setMaximumSize(sizeDimension);
         SquarePanel[][] squares;
-        try {
-            squares = Board.getInstance().getSquares();
-        } catch (InstanceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        squares = Board.getInstance().getSquares();
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
                 SquarePanel square = squares[row][col];

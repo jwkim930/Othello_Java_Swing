@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+/**
+ * MouseListener used for enabling debug mode in the startup screen.
+ */
 public class DebugMouseListener implements MouseListener {
     private Thread timer;
 

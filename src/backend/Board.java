@@ -1,11 +1,11 @@
 package backend;
 
+import exceptions.SingletonAlreadyExistsException;
+import exceptions.SingletonNotYetExistsException;
 import gui.BoardPanel;
 import gui.GameFrame;
 import gui.SquarePanel;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,11 +61,11 @@ public class Board {
      * Initializes the board singleton instance.
      *
      * @param sz The size of the board.
-     * @throws InstanceAlreadyExistsException If this has already been called before.
+     * @throws SingletonAlreadyExistsException If this has already been called before.
      */
-    public static void initialize(int sz) throws InstanceAlreadyExistsException {
+    public static void initialize(int sz) throws SingletonAlreadyExistsException {
         if (instance != null) {
-            throw new InstanceAlreadyExistsException("initialize() called after Board has been initialized.");
+            throw new SingletonAlreadyExistsException("initialize() called after Board has been initialized.");
         }
         else {
             instance = new Board(sz);
@@ -83,11 +83,11 @@ public class Board {
      * Returns the singleton instance of the board.
      *
      * @return The instance of the board.
-     * @throws InstanceNotFoundException If the board has not been initialized yet.
+     * @throws SingletonNotYetExistsException If the board has not been initialized yet.
      */
-    public static Board getInstance() throws InstanceNotFoundException {
+    public static Board getInstance() throws SingletonNotYetExistsException {
         if (instance == null) {
-            throw new InstanceNotFoundException("getInstance() called before Board has been initialized.");
+            throw new SingletonNotYetExistsException("getInstance() called before Board has been initialized.");
         }
         else {
             return instance;
@@ -156,11 +156,7 @@ public class Board {
                     square.flip();
                 }
             }
-            try {
-                GameFrame.getInstance().nextTurn();
-            } catch (InstanceNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
+            GameFrame.getInstance().nextTurn();
             return true;
         }
     }
