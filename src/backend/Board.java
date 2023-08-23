@@ -96,7 +96,8 @@ public class Board {
 
     /**
      * Get the 2D array of square cells in the board.
-     * Refrain from using this, and use getSquareAt() whenever possible.
+     * Refrain from using this unless you need to access
+     * the entire board, and use {@code getSquareAt()} instead.
      *
      * @return The array of square cells in the board.
      */

@@ -125,6 +125,24 @@ public class SquarePanel extends JPanel implements Rebuildable {
     }
 
     /**
+     * Removes the stone on this square and refreshes the panel.
+     * This re-enables this square for user interaction.
+     * This is only intended to be called in debug mode.
+     *
+     * @throws IllegalStateException If the square doesn't have a stone.
+     */
+    public void remove() {
+        if (this.stone == null) {
+            throw new IllegalStateException("No stone exists on this square.");
+        }
+        else {
+            this.stone = null;
+            this.addMouseListener(new SquareMouseListener());
+            this.rebuild();
+        }
+    }
+
+    /**
      * Replaces the stone on this square with the opposite stone.
      * @throws IllegalStateException If there is no stone on the square.
      */
@@ -247,10 +265,21 @@ public class SquarePanel extends JPanel implements Rebuildable {
 
     /**
      * Sets the color to be used for idle squares.
+     * This also redraws the square to show the change.
      *
      * @param color The color to be used as the idle color.
      */
     public void setIdleColor(Color color) {
         this.currentIdleColor = color;
+        idleBackground();
+    }
+
+    /**
+     * Returns the default idle background color to be used.
+     *
+     * @return The default idle color to be used.
+     */
+    public static Color getDefaultBackgroundColor() {
+        return defaultBackgroundColor;
     }
 }

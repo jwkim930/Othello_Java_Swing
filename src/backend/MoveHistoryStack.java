@@ -59,8 +59,8 @@ public class MoveHistoryStack {
 
     /**
      * Returns the move before the current move.
-     * This also shifts the current position.
-     * The current position must not be the first move.
+     * This also shifts the current position
+     * unless it is the first move.
      *
      * @return The move before the current move. {@code null} if it is the first move.
      */
@@ -74,8 +74,8 @@ public class MoveHistoryStack {
 
     /**
      * Returns the move after the current move.
-     * This also shifts the current position.
-     * The current position must not be the last move.
+     * This also shifts the current position
+     * unless it is the last move.
      *
      * @return The move after the current move. {@code null} if it is the last move.
      */

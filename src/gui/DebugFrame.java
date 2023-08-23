@@ -1,5 +1,6 @@
 package gui;
 
+import backend.Board;
 import backend.MoveHistory;
 import backend.MoveHistoryStack;
 import backend.Stone;
@@ -100,12 +101,12 @@ public class DebugFrame extends JFrame {
         timeMachinePanel.setLayout(new BoxLayout(timeMachinePanel, BoxLayout.LINE_AXIS));
         JButton prevButton = new JButton("<");
         prevButton.addActionListener(e -> {
-            this.updateBoard(this.moveHistories.previous(), false);
+            this.goToAdjacentMove(false);
             this.updateTurnIndicator();
         });
         JButton nextButton = new JButton(">");
         nextButton.addActionListener(e -> {
-            this.updateBoard(this.moveHistories.next(), true);
+            this.goToAdjacentMove(true);
             this.updateTurnIndicator();
         });
         JCheckBox showMoveCheck = new JCheckBox("Show movements");
@@ -113,6 +114,12 @@ public class DebugFrame extends JFrame {
         showMoveCheck.addActionListener(e -> {
             JCheckBox box = (JCheckBox) e.getSource();
             this.showMove = box.isSelected();
+            if (this.showMove) {
+                this.drawMoveHighlights();
+            }
+            else {
+                this.clearMoveHighlights();
+            }
         });
         timeMachinePanel.add(prevButton);
         timeMachinePanel.add(nextButton);
@@ -142,22 +149,101 @@ public class DebugFrame extends JFrame {
     public void addMoveHistory(Stone stone, int row, int col, int[][] flipped) {
         if (this.moveHistories == null) {
             this.moveHistories = new MoveHistoryStack(stone, row, col, flipped);
+            if (this.showMove) {
+                this.drawMoveHighlights();
+            }
         }
         else {
+            if (this.showMove) {
+                this.clearMoveHighlights();
+            }
             this.moveHistories.push(stone, row, col, flipped);
+            if (this.showMove) {
+                this.drawMoveHighlights();
+            }
+        }
+        this.updateTurnIndicator();
+    }
+
+    /**
+     * Changes background color of squares to mark where the stone was placed
+     * and which stones were flipped according to the current move history
+     * being viewed.
+     *
+     * Where the stone is placed will be marked blue,
+     * and where the stones were flipped will be marked cyan.
+     *
+     * @throws IllegalStateException If the checkbox for showing move is unchecked.
+     */
+    private void drawMoveHighlights() {
+        if (!this.showMove) {
+            throw new IllegalStateException("Call to highlight drawer when move is not being shown.");
+        }
+        Color stonePlaced = new Color(143, 173, 204);
+        Color stoneFlipped = new Color(143, 204, 204);
+
+        Board board = Board.getInstance();
+        MoveHistory history = this.moveHistories.current();
+        int[] placeCoor = history.getLocation();
+        board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(stonePlaced);
+        for (int[] flipCoor : history.getFlipped()) {
+            board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(stoneFlipped);
         }
     }
 
     /**
-     * Make the board show a new state in the history.
-     *
-     * @param move The movement made.
-     * @param next {@code true} if going forward in movement (that is,
-     *             the stone should be placed) and {@code false} if going backward
-     *             (that is, the stone should be removed).
+     * Removes highlights showing the move.
      */
-    public void updateBoard(MoveHistory move, boolean next) {
-        // stub for now
+    private void clearMoveHighlights() {
+        Board board = Board.getInstance();
+        MoveHistory history = this.moveHistories.current();
+        int[] placeCoor = history.getLocation();
+        board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+        for (int[] flipCoor : history.getFlipped()) {
+            board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+        }
+    }
+
+    /**
+     * Shows the move before/after the current move.
+     * This moves the current position in move history stack.
+     * This method does nothing if there is no next/previous move
+     * in the stack.
+     *
+     * @param next {@code true} if going to the move after the current move,
+     *             {@code false} if going to the move before.
+     */
+    private void goToAdjacentMove(boolean next) {
+        if (this.showMove) {
+            this.clearMoveHighlights();
+        }
+        Board board = Board.getInstance();
+        try {
+            if (next) {
+                MoveHistory move = this.moveHistories.next();
+                Stone stone = move.getStone();
+                int[] placeCoor = move.getLocation();
+                board.getSquareAt(placeCoor[0], placeCoor[1]).place(stone);
+                for (int[] flipCoor : move.getFlipped()) {
+                    board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
+                }
+            } else {
+                MoveHistory move = this.moveHistories.current();
+                int[] placeCoor = move.getLocation();
+                board.getSquareAt(placeCoor[0], placeCoor[1]).remove();
+                for (int[] flipCoor : move.getFlipped()) {
+                    board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
+                }
+                this.moveHistories.previous();
+            }
+        }
+        catch (NullPointerException e) {
+            // next/previous move does not exist, do nothing
+        }
+        if (this.showMove) {
+            this.drawMoveHighlights();
+        }
+        this.updateTurnIndicator();
     }
 
     /**
