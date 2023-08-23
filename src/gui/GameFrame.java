@@ -181,7 +181,7 @@ public class GameFrame extends JFrame implements Rebuildable {
         for (int row = 0; row < board.getSize(); row++) {
             for (int col = 0; col < board.getSize(); col++) {
                 SquarePanel square = board.getSquareAt(row, col);
-                square.setBackgroundColor(Color.GRAY);
+                square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
                 if (square.getStone() == null) {
                     square.removeMouseListener(square.getMouseListeners()[0]);
                 }

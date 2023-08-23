@@ -38,7 +38,7 @@ public class DebugMouseListener implements MouseListener {
                 StartupFrame frame = (StartupFrame) title.getTopLevelAncestor();
                 frame.enableDebugMode();
             } catch (InterruptedException ex) {
-                System.out.println("Debug mode canceled.");;
+                System.out.println("Debug mode canceled.");
             }
         });
         this.timer.start();

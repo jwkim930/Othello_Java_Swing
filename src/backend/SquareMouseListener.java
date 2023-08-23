@@ -29,7 +29,7 @@ public class SquareMouseListener implements MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         SquarePanel square = (SquarePanel) e.getSource();
-        square.setBackgroundColor(Color.DARK_GRAY);
+        square.setBackgroundColor(SquarePanel.MOUSE_CLICKED_COLOR);
     }
 
     /**
@@ -57,7 +57,7 @@ public class SquareMouseListener implements MouseListener {
     @Override
     public void mouseEntered(MouseEvent e) {
         SquarePanel square = (SquarePanel) e.getSource();
-        square.setBackgroundColor(Color.GRAY);
+        square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
     }
 
     /**
@@ -70,9 +70,9 @@ public class SquareMouseListener implements MouseListener {
     public void mouseExited(MouseEvent e) {
         SquarePanel square = (SquarePanel) e.getSource();
         Color squareColor = square.getBackgroundColor();
-        if (squareColor.equals(Color.GRAY) || squareColor.equals(Color.DARK_GRAY)) {
+        if (squareColor.equals(SquarePanel.MOUSE_ENTERED_COLOR) || squareColor.equals(SquarePanel.MOUSE_CLICKED_COLOR)) {
             // square isn't flashing for invalid move
-            square.setBackgroundColor(SquarePanel.getDefaultBackgroundColor());
+            square.idleBackground();
         }
     }
 }

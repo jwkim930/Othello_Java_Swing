@@ -38,6 +38,20 @@ public class SquarePanel extends JPanel implements Rebuildable {
      * In regular game play, this is light gray. In debug mode, it's light green.
      */
     private static Color defaultBackgroundColor;
+    /**
+     * The current background color of the square when not interacting with anything.
+     * "Not interacting" does not include the square flashing from invalid move.
+     * Changed in debug mode to show move history.
+     */
+    private Color currentIdleColor;
+    /**
+     * Background color to be used when the cursor enters the square.
+     */
+    public static final Color MOUSE_ENTERED_COLOR = Color.GRAY;
+    /**
+     * Background color to be used when the square is clicked.
+     */
+    public static final Color MOUSE_CLICKED_COLOR = Color.DARK_GRAY;
 
     /**
      * Initializes a SquarePanel. There is no stone on it initially.
@@ -55,7 +69,8 @@ public class SquarePanel extends JPanel implements Rebuildable {
         this.setMaximumSize(sizeDimension);
         this.addMouseListener(new SquareMouseListener());
         defaultBackgroundColor = isDebugMode() ? new Color(143, 204, 143) : Color.LIGHT_GRAY;
-        this.backgroundColor = defaultBackgroundColor;
+        this.currentIdleColor = defaultBackgroundColor;
+        this.backgroundColor = this.currentIdleColor;
         this.coordinate = new int[] {row, col};
     }
 
@@ -105,7 +120,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
         else {
             this.stone = stone;
             this.removeMouseListener(this.getMouseListeners()[0]);
-            this.setBackgroundColor(SquarePanel.defaultBackgroundColor);
+            this.idleBackground();
         }
     }
 
@@ -191,7 +206,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            this.setBackgroundColor(SquarePanel.defaultBackgroundColor);
+            this.idleBackground();
         });
         setColorBack.start();
     }
@@ -202,7 +217,7 @@ public class SquarePanel extends JPanel implements Rebuildable {
      * @return The coordinate of this square as [row, col].
      */
     public int[] getCoordinate() {
-        return this.coordinate;
+        return this.coordinate.clone();
     }
 
     /**
@@ -223,12 +238,19 @@ public class SquarePanel extends JPanel implements Rebuildable {
     }
 
     /**
-     * Returns the background color to be used when nothing happens to the square.
-     * That is, the mouse cursor hasn't entered the square, or it already has a stone inside.
-     *
-     * @return The default background color to be used.
+     * Sets the background color to its idle background color.
+     * This also redraws the square to show the change.
      */
-    public static Color getDefaultBackgroundColor() {
-        return defaultBackgroundColor;
+    public void idleBackground() {
+        this.setBackgroundColor(this.currentIdleColor);
+    }
+
+    /**
+     * Sets the color to be used for idle squares.
+     *
+     * @param color The color to be used as the idle color.
+     */
+    public void setIdleColor(Color color) {
+        this.currentIdleColor = color;
     }
 }
