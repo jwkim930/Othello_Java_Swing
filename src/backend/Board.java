@@ -3,6 +3,7 @@ package backend;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 import gui.BoardPanel;
+import gui.DebugFrame;
 import gui.GameFrame;
 import gui.SquarePanel;
 
@@ -149,13 +150,18 @@ public class Board {
         else {
             // place stone and flip appropriately
             this.getSquareAt(row, col).place(stone);
+            List<int[]> flipList = new ArrayList<>();
             for (Direction dir : flippableDirections) {
                 // getFlippingDirections() already ensures all stones in the direction are flippable
                 for (SquarePanel square = this.getSquareAt(row, col).getAdjacent(dir);
                   square.getStone().equals(stone.getOpposite());
                   square = square.getAdjacent(dir)) {
                     square.flip();
+                    flipList.add(square.getCoordinate());
                 }
+            }
+            if (GameFrame.isDebugMode()) {
+                DebugFrame.getInstance().addMoveHistory(stone, row, col, flipList.toArray(new int[flipList.size()][2]));
             }
             GameFrame.getInstance().nextTurn();
             return true;

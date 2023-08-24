@@ -109,6 +109,23 @@ public class GameFrame extends JFrame implements Rebuildable {
         this.bottomRowPanel = new JPanel();
         this.rebuild();
         this.add(this.bottomRowPanel);
+
+        // if debug mode is enabled, open debug window
+        if (isDebugMode()) {
+            DebugFrame.initialize();
+            JFrame frame = DebugFrame.getInstance();
+            frame.setTitle("Debug Menu");
+            frame.setSize(DebugFrame.SIZE_X, DebugFrame.SIZE_Y);
+            frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            frame.setResizable(false);
+            // place window to the right of the game window
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int locationX = (int) (screenSize.getWidth() - GameFrame.SIZE_X) / 2;   // GameFrame location
+            int locationY = (int) (screenSize.getHeight() - GameFrame.SIZE_Y) / 2;   // GameFrame location
+            locationX += GameFrame.SIZE_X;
+            frame.setLocation(new Point(locationX, locationY));
+            frame.setVisible(true);
+        }
     }
 
     public void rebuild() {
@@ -252,7 +269,10 @@ public class GameFrame extends JFrame implements Rebuildable {
                         .addComponent(exitButton)
                 )
         );
-
+        // if in debug mode, close debug window
+        if (isDebugMode()) {
+            DebugFrame.getInstance().dispose();
+        }
     }
 
     /**

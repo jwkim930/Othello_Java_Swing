@@ -111,14 +111,18 @@ public class DebugFrame extends JFrame {
         });
         JCheckBox showMoveCheck = new JCheckBox("Show movements");
         this.showMove = false;
-        showMoveCheck.addActionListener(e -> {
-            JCheckBox box = (JCheckBox) e.getSource();
+        showMoveCheck.addActionListener(event -> {
+            JCheckBox box = (JCheckBox) event.getSource();
             this.showMove = box.isSelected();
-            if (this.showMove) {
-                this.drawMoveHighlights();
+            try {
+                if (this.showMove) {
+                    this.drawMoveHighlights();
+                } else {
+                    this.clearMoveHighlights();
+                }
             }
-            else {
-                this.clearMoveHighlights();
+            catch (NullPointerException e) {
+                // Interacted with checkbox before history is initialized, ignore it.
             }
         });
         timeMachinePanel.add(prevButton);
@@ -182,12 +186,15 @@ public class DebugFrame extends JFrame {
         Color stonePlaced = new Color(143, 173, 204);
         Color stoneFlipped = new Color(143, 204, 204);
 
-        Board board = Board.getInstance();
         MoveHistory history = this.moveHistories.current();
-        int[] placeCoor = history.getLocation();
-        board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(stonePlaced);
-        for (int[] flipCoor : history.getFlipped()) {
-            board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(stoneFlipped);
+        if (history != null) {
+            // not looking at the state before the first move, there highlights to draw
+            Board board = Board.getInstance();
+            int[] placeCoor = history.getLocation();
+            board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(stonePlaced);
+            for (int[] flipCoor : history.getFlipped()) {
+                board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(stoneFlipped);
+            }
         }
     }
 
@@ -195,12 +202,15 @@ public class DebugFrame extends JFrame {
      * Removes highlights showing the move.
      */
     private void clearMoveHighlights() {
-        Board board = Board.getInstance();
         MoveHistory history = this.moveHistories.current();
-        int[] placeCoor = history.getLocation();
-        board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
-        for (int[] flipCoor : history.getFlipped()) {
-            board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+        if (history != null) {
+            // not looking at the state before the first move, there are highlights to remove
+            Board board = Board.getInstance();
+            int[] placeCoor = history.getLocation();
+            board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+            for (int[] flipCoor : history.getFlipped()) {
+                board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+            }
         }
     }
 
@@ -236,6 +246,7 @@ public class DebugFrame extends JFrame {
                 }
                 this.moveHistories.previous();
             }
+            GameFrame.getInstance().nextTurn();
         }
         catch (NullPointerException e) {
             // next/previous move does not exist, do nothing

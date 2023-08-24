@@ -67,12 +67,13 @@ public class StartupFrame extends JFrame {
         this.sizeSliderPanel.setAlignmentX(0.5f);
         JLabel sizeLabel = new JLabel("Board size: " + SIZE_INITIAL);
         sizeLabel.setAlignmentX(0.5f);
-        JSlider sizeSlider = new JSlider(SIZE_MIN, SIZE_MAX, SIZE_INITIAL);
+        // slider values are divided and then multiplied by 2 so that only even number can be used
+        JSlider sizeSlider = new JSlider(SIZE_MIN / 2, SIZE_MAX / 2, SIZE_INITIAL / 2);
         sizeSlider.setSize(new Dimension((int) (SIZE_X * 0.8), 18));
         sizeSlider.setPreferredSize(new Dimension((int) (SIZE_X * 0.8), 18));
         sizeSlider.setMinimumSize(new Dimension((int) (SIZE_X * 0.8), 18));
         sizeSlider.setMaximumSize(new Dimension((int) (SIZE_X * 0.8), 18));
-        sizeSlider.addChangeListener(e -> sizeLabel.setText("Board size: " + sizeSlider.getValue()));
+        sizeSlider.addChangeListener(e -> sizeLabel.setText("Board size: " + sizeSlider.getValue() * 2));
         this.sizeSliderPanel.add(sizeLabel);
         this.sizeSliderPanel.add(sizeSlider);
         this.add(this.sizeSliderPanel);
@@ -83,7 +84,7 @@ public class StartupFrame extends JFrame {
         // Start button
         this.startButton = new JButton("Start");
         this.startButton.setAlignmentX(0.5f);
-        this.startButton.addActionListener(e -> startGame(((JSlider) this.sizeSliderPanel.getComponent(1)).getValue()));
+        this.startButton.addActionListener(e -> startGame(((JSlider) this.sizeSliderPanel.getComponent(1)).getValue() * 2));
         this.add(startButton);
     }
 
@@ -95,7 +96,7 @@ public class StartupFrame extends JFrame {
     public void startGame(int size) {
         GameFrame.initialize(size, this.debug);
         JFrame frame = GameFrame.getInstance();
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
         // place window in the middle of the screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

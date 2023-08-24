@@ -7,8 +7,7 @@ import java.util.List;
  * Used to record the history of moves made.
  * Uses LIFO stack structure, but also gives ability to move back and forth without removing content.
  * Adding a new element (by making a move) will clear all histories after.
- * Note that the state before the first move is not recorded, so the first element in this stack
- * records the second turn of the game and so on.
+ * Note that this stack records the changes, not the state of the board.
  */
 public class MoveHistoryStack {
     /**
@@ -18,7 +17,8 @@ public class MoveHistoryStack {
     /**
      * Records where in the stack is being viewed.
      * Should be equal to {@code histories.size() - 1} if looking
-     * at the latest move.
+     * at the latest move. Can be -1, which would indicate that
+     * we're looking at the initial state.
      */
     private int currentPosition;
 
@@ -60,13 +60,16 @@ public class MoveHistoryStack {
     /**
      * Returns the move before the current move.
      * This also shifts the current position
-     * unless it is the first move.
+     * unless it is before the first move.
      *
-     * @return The move before the current move. {@code null} if it is the first move.
+     * @return The move before the current move.
+     *         {@code null} if it is the first move or before.
      */
     public MoveHistory previous() {
-        if (this.currentPosition > 0) {
+        if (this.currentPosition >= 0) {
             this.currentPosition--;
+        }
+        if (this.currentPosition > -1) {
             return this.histories.get(this.currentPosition);
         }
         return null;
@@ -91,9 +94,15 @@ public class MoveHistoryStack {
      * Returns the move currently being viewed.
      *
      * @return The move currently being viewed.
+     *         {@code null} if looking at the state before the first move.
      */
     public MoveHistory current() {
-        return this.histories.get(this.currentPosition);
+        if (currentPosition > -1) {
+            return this.histories.get(this.currentPosition);
+        }
+        else {
+            return null;
+        }
     }
 
     /**
