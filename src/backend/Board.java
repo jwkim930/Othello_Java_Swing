@@ -162,8 +162,13 @@ public class Board {
             }
             if (GameFrame.isDebugMode()) {
                 DebugFrame.getInstance().addMoveHistory(stone, row, col, flipList.toArray(new int[flipList.size()][2]));
+                if (DebugFrame.getInstance().shouldChangeTurn()) {
+                    GameFrame.getInstance().nextTurn();
+                }
             }
-            GameFrame.getInstance().nextTurn();
+            else {
+                GameFrame.getInstance().nextTurn();
+            }
             return true;
         }
     }

@@ -1,7 +1,10 @@
 package backend;
 
+import gui.DebugFrame;
+import gui.GameFrame;
 import gui.SquarePanel;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -28,23 +31,38 @@ public class SquareMouseListener implements MouseListener {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        SquarePanel square = (SquarePanel) e.getSource();
-        square.setBackgroundColor(SquarePanel.MOUSE_CLICKED_COLOR);
+        if (GameFrame.isDebugMode() || SwingUtilities.isLeftMouseButton(e)) {
+            SquarePanel square = (SquarePanel) e.getSource();
+            square.setBackgroundColor(SquarePanel.MOUSE_CLICKED_COLOR);
+        }
     }
 
     /**
      * Invoked when a mouse button has been released on a component.
-     * This places the stone if it's a valid move, or flashes the
-     * square otherwise.
+     * A left click places the stone if it's a valid move, or flashes the
+     * square otherwise. If debug mode is enabled, then a right click
+     * places the stone regardless.
      *
      * @param e the event to be processed
      */
     @Override
     public void mouseReleased(MouseEvent e) {
         SquarePanel square = (SquarePanel) e.getSource();
+        Board board = Board.getInstance();
         int row = square.getCoordinate()[0], col = square.getCoordinate()[1];
-        if (!Board.getInstance().placeStone(row, col)) {
-            square.invalidMoveFlash();
+        if (SwingUtilities.isLeftMouseButton(e)) {
+            if (!board.placeStone(row, col)) {
+                square.invalidMoveFlash();
+            }
+        }
+        else if (SwingUtilities.isRightMouseButton(e) && GameFrame.isDebugMode()) {
+            DebugFrame frame = DebugFrame.getInstance();
+            Stone stone = board.getTurn();
+            square.place(stone);
+            frame.addMoveHistory(stone, row, col, new int[0][2]);
+            if (frame.shouldChangeTurn()) {
+                GameFrame.getInstance().nextTurn();
+            }
         }
     }
 

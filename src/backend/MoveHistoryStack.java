@@ -122,4 +122,13 @@ public class MoveHistoryStack {
     public int currentPosition() {
         return this.currentPosition;
     }
+
+    /**
+     * Reports if the current reading position is the last move in the stack.
+     *
+     * @return {@code true} if it is the last move, {@code false} otherwise.
+     */
+    public boolean atLastMove() {
+        return this.currentPosition == this.size() - 1;
+    }
 }

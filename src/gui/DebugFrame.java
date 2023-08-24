@@ -28,7 +28,7 @@ public class DebugFrame extends JFrame {
     /**
      * The height of the window in pixels.
      */
-    public final static int SIZE_Y = 120;
+    public final static int SIZE_Y = 180;
     /**
      * Shows how many turns have passed since the beginning.
      */
@@ -42,6 +42,16 @@ public class DebugFrame extends JFrame {
      * Records the history of all moves made.
      */
     private MoveHistoryStack moveHistories;
+    /**
+     * When {@code true}, placing a stone does not change turn.
+     */
+    private boolean dontChangeTurn;
+    /**
+     * This records the stone selected to be placed (the one appears next to "Current Turn"
+     * in the game window) when the previous button in the time machine is used.
+     * This is cleared when you go to the latest move (either by next button or making a new move).
+     */
+    Stone lastStoneSelectedBefore;
 
     /**
      * Initializes the singleton instance of the debug window.
@@ -87,13 +97,29 @@ public class DebugFrame extends JFrame {
     private DebugFrame() {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
+        this.add(Box.createVerticalStrut(5));
+
+        // Text instruction
+        this.add(new JLabel("Right click to place a stone anywhere,"));
+        this.add(new JLabel("regardless of whether it is a valid move."));
+
+        this.add(Box.createVerticalGlue());
+
         // Turn indicator
         this.turnIndicator = new JLabel();
         this.updateTurnIndicator();
         this.turnIndicator.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(this.turnIndicator);
+        // Don't change turn checkbox
+        this.dontChangeTurn = false;
+        JCheckBox dontChangeTurnCheck = new JCheckBox("Don't change turn after making a move");
+        dontChangeTurnCheck.addActionListener(e -> {
+            JCheckBox box = (JCheckBox) e.getSource();
+            this.dontChangeTurn = box.isSelected();
+        });
+        this.add(dontChangeTurnCheck);
 
-        this.add(Box.createRigidArea(new Dimension(0, 10)));
+        this.add(Box.createVerticalGlue());
 
         // Time machine
         this.add(new JLabel("Time Machine:"));
@@ -130,6 +156,8 @@ public class DebugFrame extends JFrame {
         timeMachinePanel.add(showMoveCheck);
         timeMachinePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(timeMachinePanel);
+
+        this.add(Box.createVerticalStrut(5));
     }
 
     /**
@@ -138,7 +166,7 @@ public class DebugFrame extends JFrame {
     private void updateTurnIndicator() {
         int currentTurn = this.moveHistories == null ? 1 : this.moveHistories.currentPosition() + 2;
         int totalTurn = this.moveHistories == null ? 1 : this.moveHistories.size() + 1;
-        this.turnIndicator.setText("Current Turn: " + currentTurn + "/" + totalTurn);
+        this.turnIndicator.setText("Current Turn count: " + currentTurn + "/" + totalTurn);
     }
 
     /**
@@ -167,6 +195,7 @@ public class DebugFrame extends JFrame {
             }
         }
         this.updateTurnIndicator();
+        this.lastStoneSelectedBefore = null;
     }
 
     /**
@@ -229,6 +258,7 @@ public class DebugFrame extends JFrame {
         }
         Board board = Board.getInstance();
         try {
+            boolean changeTurn;
             if (next) {
                 MoveHistory move = this.moveHistories.next();
                 Stone stone = move.getStone();
@@ -237,8 +267,22 @@ public class DebugFrame extends JFrame {
                 for (int[] flipCoor : move.getFlipped()) {
                     board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
                 }
+                // peek into the next move to see what stone was placed in it
+                if (!this.moveHistories.atLastMove()) {
+                    changeTurn = !this.moveHistories.next().getStone().equals(board.getTurn());
+                    this.moveHistories.previous();
+                }
+                else {
+                    changeTurn = !this.lastStoneSelectedBefore.equals(board.getTurn());
+                    this.lastStoneSelectedBefore = null;
+                }
             } else {
+                Stone stoneOnScreen = board.getTurn();
+                if (this.moveHistories.atLastMove()) {
+                    this.lastStoneSelectedBefore = stoneOnScreen;
+                }
                 MoveHistory move = this.moveHistories.current();
+                changeTurn = !move.getStone().equals(stoneOnScreen);
                 int[] placeCoor = move.getLocation();
                 board.getSquareAt(placeCoor[0], placeCoor[1]).remove();
                 for (int[] flipCoor : move.getFlipped()) {
@@ -246,7 +290,9 @@ public class DebugFrame extends JFrame {
                 }
                 this.moveHistories.previous();
             }
-            GameFrame.getInstance().nextTurn();
+            if (changeTurn) {
+                GameFrame.getInstance().nextTurn();
+            }
         }
         catch (NullPointerException e) {
             // next/previous move does not exist, do nothing
@@ -255,6 +301,17 @@ public class DebugFrame extends JFrame {
             this.drawMoveHighlights();
         }
         this.updateTurnIndicator();
+    }
+
+    /**
+     * Tells whether the debug window is telling the application
+     * to change turn upon making a move.
+     *
+     * @return {@code true} if the turn should be changed (i.e. default
+     *         behaviour), and {@code false} otherwise.
+     */
+    public boolean shouldChangeTurn() {
+        return !dontChangeTurn;
     }
 
     /**

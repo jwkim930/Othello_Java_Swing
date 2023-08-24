@@ -107,6 +107,19 @@ public class StartupFrame extends JFrame {
         frame.setResizable(false);
         this.setVisible(false);
         frame.setVisible(true);
+        // if debug mode is enabled, open debug window
+        if (this.debug) {
+            DebugFrame.initialize();
+            JFrame dFrame = DebugFrame.getInstance();
+            dFrame.setTitle("Debug Menu");
+            dFrame.setSize(DebugFrame.SIZE_X, DebugFrame.SIZE_Y);
+            dFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            dFrame.setResizable(false);
+            // place window to the right of the game window
+            locationX += GameFrame.SIZE_X;
+            dFrame.setLocation(new Point(locationX, locationY));
+            dFrame.setVisible(true);
+        }
         this.dispose();
     }
 
