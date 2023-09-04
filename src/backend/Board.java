@@ -142,9 +142,14 @@ public class Board {
      * @return {@code true} if it's a valid move, {@code false} otherwise.
      */
     public boolean placeStone(int row, int col) {
+        if (this.getSquareAt(row, col).getStone() != null) {
+            // stone already exists on the square
+            return false;
+        }
         Stone stone = this.getTurn();
         Direction[] flippableDirections = this.getFlippingDirections(stone, row, col);
         if (flippableDirections.length == 0) {
+            // no stone would be flipped; invalid move
             return false;
         }
         else {

@@ -9,6 +9,10 @@ import exceptions.SingletonNotYetExistsException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * Window containing menu for the debug features.
@@ -28,7 +32,7 @@ public class DebugFrame extends JFrame {
     /**
      * The height of the window in pixels.
      */
-    public final static int SIZE_Y = 180;
+    public final static int SIZE_Y = 220;
     /**
      * Shows how many turns have passed since the beginning.
      */
@@ -156,6 +160,39 @@ public class DebugFrame extends JFrame {
         timeMachinePanel.add(showMoveCheck);
         timeMachinePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.add(timeMachinePanel);
+
+        this.add(Box.createVerticalGlue());
+
+        // make random move button
+        JPanel randomMovePanel = new JPanel();
+        randomMovePanel.setLayout(new BoxLayout(randomMovePanel, BoxLayout.LINE_AXIS));
+        randomMovePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JButton randomMoveButton = new JButton("Random Move");
+        JLabel randomMoveResultLabel = new JLabel();
+        BiConsumer<JLabel, String> showTextInLabelThenDisappear = (label, message) -> {
+            Thread worker = new Thread(() -> {
+                label.setText(message);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                label.setText("");
+            });
+            worker.start();
+        };
+        randomMoveButton.addActionListener(e -> {
+            boolean success = this.makeRandomMove();
+            if (success) {
+                showTextInLabelThenDisappear.accept(randomMoveResultLabel, "Success");
+            }
+            else {
+                showTextInLabelThenDisappear.accept(randomMoveResultLabel, "Fail");
+            }
+        });
+        randomMovePanel.add(randomMoveButton);
+        randomMovePanel.add(randomMoveResultLabel);
+        this.add(randomMovePanel);
 
         this.add(Box.createVerticalStrut(5));
     }
@@ -312,6 +349,35 @@ public class DebugFrame extends JFrame {
      */
     public boolean shouldChangeTurn() {
         return !dontChangeTurn;
+    }
+
+    /**
+     * Makes a random move, placing the current stone in a valid square.
+     * If no stone can be placed, this does nothing.
+     *
+     * @return {@code true} if a stone was placed, {@code false} otherwise.
+     */
+    public boolean makeRandomMove() {
+        int size = Board.getInstance().getSize();
+        // create a list of coordinates, then shuffle order to simulate random choices
+        List<int[]> coordinates = new ArrayList<>();
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                int[] ar = {row, col};
+                coordinates.add(ar);
+            }
+        }
+        Collections.shuffle(coordinates);
+        // go through the list and make attempts
+        for (int[] coor : coordinates) {
+            int row = coor[0], col = coor[1];
+            // if attempt was successful, end loop
+            if (Board.getInstance().placeStone(row, col)) {
+                return true;
+            }
+        }
+        // no attempt was successful
+        return false;
     }
 
     /**
