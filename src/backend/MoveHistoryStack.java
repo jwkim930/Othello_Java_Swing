@@ -1,5 +1,7 @@
 package backend;
 
+import entities.Stone;
+
 import java.util.ArrayList;
 import java.util.List;
 

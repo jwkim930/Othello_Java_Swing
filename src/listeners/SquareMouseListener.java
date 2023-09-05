@@ -1,5 +1,8 @@
-package backend;
+package listeners;
 
+import backend.Board;
+import backend.SquareBackgroundManager;
+import entities.Stone;
 import gui.DebugFrame;
 import gui.GameFrame;
 import gui.SquarePanel;

@@ -1,6 +1,6 @@
 package tests;
 
-import backend.Stone;
+import entities.Stone;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;

@@ -1,11 +1,14 @@
 package backend;
 
+import entities.Direction;
+import entities.Stone;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 import gui.BoardPanel;
 import gui.DebugFrame;
 import gui.GameFrame;
 import gui.SquarePanel;
+import listeners.SquareMouseListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +68,7 @@ public class Board {
      */
     public static void initialize(int sz) throws SingletonAlreadyExistsException {
         if (instance != null) {
-            throw new SingletonAlreadyExistsException("initialize() called after Board has been initialized.");
+            throw new SingletonAlreadyExistsException("The Board has already been initialized.");
         }
         else {
             instance = new Board(sz);
@@ -87,7 +90,7 @@ public class Board {
      */
     public static Board getInstance() throws SingletonNotYetExistsException {
         if (instance == null) {
-            throw new SingletonNotYetExistsException("getInstance() called before Board has been initialized.");
+            throw new SingletonNotYetExistsException("The Board has not been initialized yet.");
         }
         else {
             return instance;

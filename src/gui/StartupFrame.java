@@ -1,8 +1,8 @@
 package gui;
 
 import backend.Board;
-import backend.DebugMouseListener;
-import backend.Stone;
+import listeners.DebugMouseListener;
+import entities.Stone;
 
 import javax.swing.*;
 import java.awt.*;

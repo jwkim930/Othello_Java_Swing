@@ -4,7 +4,7 @@ import backend.Board;
 import backend.SquareBackgroundManager;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
-import backend.Stone;
+import entities.Stone;
 
 import javax.swing.*;
 import java.awt.*;

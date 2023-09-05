@@ -1,6 +1,7 @@
 package gui;
 
 import backend.*;
+import entities.Stone;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 

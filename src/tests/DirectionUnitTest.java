@@ -1,7 +1,7 @@
 package tests;
 
 import backend.Board;
-import backend.Direction;
+import entities.Direction;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

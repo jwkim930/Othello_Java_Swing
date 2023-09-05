@@ -1,5 +1,7 @@
 package backend;
 
+import entities.Stone;
+
 /**
  * Records the stone placed and stones flipped in a move.
  */

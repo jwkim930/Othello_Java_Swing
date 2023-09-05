@@ -1,6 +1,10 @@
 package gui;
 
-import backend.*;
+import backend.Board;
+import backend.SquareBackgroundManager;
+import entities.Direction;
+import entities.Stone;
+import listeners.SquareMouseListener;
 
 import javax.swing.*;
 import java.awt.*;

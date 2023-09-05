@@ -1,4 +1,6 @@
-package backend;
+package entities;
+
+import backend.Board;
 
 /**
  * Represents a direction. There are 8 directions in total.
