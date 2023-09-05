@@ -1,9 +1,6 @@
 package gui;
 
-import backend.Board;
-import backend.MoveHistory;
-import backend.MoveHistoryStack;
-import backend.Stone;
+import backend.*;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 
@@ -264,9 +261,9 @@ public class DebugFrame extends JFrame {
             // not looking at the state before the first move, there highlights to draw
             Board board = Board.getInstance();
             int[] placeCoor = history.getLocation();
-            board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(stonePlaced);
+            board.getSquareAt(placeCoor[0], placeCoor[1]).getBackgroundManager().setIdleColor(stonePlaced);
             for (int[] flipCoor : history.getFlipped()) {
-                board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(stoneFlipped);
+                board.getSquareAt(flipCoor[0], flipCoor[1]).getBackgroundManager().setIdleColor(stoneFlipped);
             }
         }
     }
@@ -280,9 +277,9 @@ public class DebugFrame extends JFrame {
             // not looking at the state before the first move, there are highlights to remove
             Board board = Board.getInstance();
             int[] placeCoor = history.getLocation();
-            board.getSquareAt(placeCoor[0], placeCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+            board.getSquareAt(placeCoor[0], placeCoor[1]).getBackgroundManager().setIdleColor(SquareBackgroundManager.getDefaultIdleColor());
             for (int[] flipCoor : history.getFlipped()) {
-                board.getSquareAt(flipCoor[0], flipCoor[1]).setIdleColor(SquarePanel.getDefaultBackgroundColor());
+                board.getSquareAt(flipCoor[0], flipCoor[1]).getBackgroundManager().setIdleColor(SquareBackgroundManager.getDefaultIdleColor());
             }
         }
     }

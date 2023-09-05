@@ -263,7 +263,7 @@ public class Board {
             for (int row = 0; row < this.size; row++) {
                 for (int col = 0; col < this.size; col++) {
                     SquarePanel square = this.getSquareAt(row, col);
-                    square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
+                    square.getBackgroundManager().setCurrentColor(SquareBackgroundManager.MOUSE_ENTERED_COLOR);
                     if (square.getStone() == null) {
                         square.removeMouseListener(square.getMouseListeners()[0]);
                     }
@@ -276,7 +276,7 @@ public class Board {
             for (int row = 0; row < this.size; row++) {
                 for (int col = 0; col < this.size; col++) {
                     SquarePanel square = this.getSquareAt(row, col);
-                    square.idleBackground();
+                    square.getBackgroundManager().idleBackground();
                     if (square.getStone() == null) {
                         square.addMouseListener(new SquareMouseListener());
                     }

@@ -1,6 +1,7 @@
 package gui;
 
 import backend.Board;
+import backend.SquareBackgroundManager;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 import backend.Stone;
@@ -181,7 +182,7 @@ public class GameFrame extends JFrame implements Rebuildable {
         for (int row = 0; row < board.getSize(); row++) {
             for (int col = 0; col < board.getSize(); col++) {
                 SquarePanel square = board.getSquareAt(row, col);
-                square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
+                square.getBackgroundManager().setCurrentColor(SquareBackgroundManager.MOUSE_ENTERED_COLOR);
                 if (square.getStone() == null) {
                     if (board.isInteractable()) {
                         square.removeMouseListener(square.getMouseListeners()[0]);

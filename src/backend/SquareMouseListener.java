@@ -33,7 +33,7 @@ public class SquareMouseListener implements MouseListener {
     public void mousePressed(MouseEvent e) {
         if (GameFrame.isDebugMode() || SwingUtilities.isLeftMouseButton(e)) {
             SquarePanel square = (SquarePanel) e.getSource();
-            square.setBackgroundColor(SquarePanel.MOUSE_CLICKED_COLOR);
+            square.getBackgroundManager().setCurrentColor(SquareBackgroundManager.MOUSE_CLICKED_COLOR);
         }
     }
 
@@ -52,7 +52,7 @@ public class SquareMouseListener implements MouseListener {
         int row = square.getCoordinate()[0], col = square.getCoordinate()[1];
         if (SwingUtilities.isLeftMouseButton(e)) {
             if (!board.placeStone(row, col)) {
-                square.invalidMoveFlash();
+                square.getBackgroundManager().invalidMoveFlash();
             }
         }
         else if (SwingUtilities.isRightMouseButton(e) && GameFrame.isDebugMode()) {
@@ -75,7 +75,7 @@ public class SquareMouseListener implements MouseListener {
     @Override
     public void mouseEntered(MouseEvent e) {
         SquarePanel square = (SquarePanel) e.getSource();
-        square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
+        square.getBackgroundManager().setCurrentColor(SquareBackgroundManager.MOUSE_ENTERED_COLOR);
     }
 
     /**
@@ -87,10 +87,10 @@ public class SquareMouseListener implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
         SquarePanel square = (SquarePanel) e.getSource();
-        Color squareColor = square.getBackgroundColor();
-        if (squareColor.equals(SquarePanel.MOUSE_ENTERED_COLOR) || squareColor.equals(SquarePanel.MOUSE_CLICKED_COLOR)) {
+        Color squareColor = square.getBackgroundManager().getCurrentColor();
+        if (squareColor.equals(SquareBackgroundManager.MOUSE_ENTERED_COLOR) || squareColor.equals(SquareBackgroundManager.MOUSE_CLICKED_COLOR)) {
             // square isn't flashing for invalid move
-            square.idleBackground();
+            square.getBackgroundManager().idleBackground();
         }
     }
 }
