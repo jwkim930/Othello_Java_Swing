@@ -32,7 +32,7 @@ public class DebugFrame extends JFrame {
     /**
      * The height of the window in pixels.
      */
-    public final static int SIZE_Y = 220;
+    public final static int SIZE_Y = 250;
     /**
      * Shows how many turns have passed since the beginning.
      */
@@ -193,6 +193,13 @@ public class DebugFrame extends JFrame {
         randomMovePanel.add(randomMoveButton);
         randomMovePanel.add(randomMoveResultLabel);
         this.add(randomMovePanel);
+
+        this.add(Box.createVerticalGlue());
+
+        // interaction toggle button
+        JButton toggleInteractionButton = new JButton("Toggle Interaction");
+        toggleInteractionButton.addActionListener(e -> Board.getInstance().toggleInteractable());
+        this.add(toggleInteractionButton);
 
         this.add(Box.createVerticalStrut(5));
     }

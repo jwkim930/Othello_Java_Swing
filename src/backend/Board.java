@@ -32,6 +32,10 @@ public class Board {
      * The player of the current turn. Black takes the first turn, then it alternates.
      */
     private Stone turn;
+    /**
+     * Whether a player (not including AI) can interact with the board or not.
+     */
+    private boolean interactable;
 
     /**
      * Initializes the Othello board. Should only be called once in the beginning.
@@ -40,6 +44,7 @@ public class Board {
      */
     private Board(int size) {
         this.size = size;
+        this.interactable = true;
         this.squares = new SquarePanel[size][size];
         int sqSize = BoardPanel.SIZE / size;
         SquarePanel.setSquareSize(sqSize);
@@ -48,12 +53,6 @@ public class Board {
                 this.squares[row][col] = new SquarePanel(row, col);
             }
         }
-        // place the 4 starting stones
-        int topLeft = size / 2 - 1;
-        this.getSquareAt(topLeft, topLeft).place(Stone.WHITE);
-        this.getSquareAt(topLeft, topLeft + 1).place(Stone.BLACK);
-        this.getSquareAt(topLeft + 1, topLeft).place(Stone.BLACK);
-        this.getSquareAt(topLeft + 1, topLeft + 1).place(Stone.WHITE);
         // the first turn is black
         this.turn = Stone.BLACK;
     }
@@ -238,9 +237,52 @@ public class Board {
 
     /**
      * Let the other player make the move.
-     * Should only be called by GameFrame, otherwise call nextTurn() in GameFrame.
+     * This should only be called by {@code GameFrame},
+     * otherwise call {@code nextTurn()} in {@code GameFrame}.
      */
     public void nextTurn() {
         this.turn = this.turn.getOpposite();
+    }
+
+    /**
+     * Tells whether a player (non-AI) can interact with the board.
+     *
+     * @return {@code true} if it is interactable, {@code false} otherwise.
+     */
+    public boolean isInteractable() {
+        return this.interactable;
+    }
+
+    /**
+     * Makes a board interactable if it wasn't, or make it not interactable
+     * if it was.
+     */
+    public void toggleInteractable() {
+        if (this.interactable) {
+            // disable player interaction
+            for (int row = 0; row < this.size; row++) {
+                for (int col = 0; col < this.size; col++) {
+                    SquarePanel square = this.getSquareAt(row, col);
+                    square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
+                    if (square.getStone() == null) {
+                        square.removeMouseListener(square.getMouseListeners()[0]);
+                    }
+                }
+            }
+            this.interactable = false;
+        }
+        else {
+            // enable player interaction
+            for (int row = 0; row < this.size; row++) {
+                for (int col = 0; col < this.size; col++) {
+                    SquarePanel square = this.getSquareAt(row, col);
+                    square.idleBackground();
+                    if (square.getStone() == null) {
+                        square.addMouseListener(new SquareMouseListener());
+                    }
+                }
+            }
+            this.interactable = true;
+        }
     }
 }

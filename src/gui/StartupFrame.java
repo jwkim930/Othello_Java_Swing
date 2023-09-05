@@ -1,6 +1,8 @@
 package gui;
 
+import backend.Board;
 import backend.DebugMouseListener;
+import backend.Stone;
 
 import javax.swing.*;
 import java.awt.*;
@@ -120,6 +122,14 @@ public class StartupFrame extends JFrame {
             dFrame.setLocation(new Point(locationX, locationY));
             dFrame.setVisible(true);
         }
+        // place the 4 starting stones
+        Board board = Board.getInstance();
+        int topLeft = size / 2 - 1;
+        board.getSquareAt(topLeft, topLeft).place(Stone.WHITE);
+        board.getSquareAt(topLeft, topLeft + 1).place(Stone.BLACK);
+        board.getSquareAt(topLeft + 1, topLeft).place(Stone.BLACK);
+        board.getSquareAt(topLeft + 1, topLeft + 1).place(Stone.WHITE);
+
         this.dispose();
     }
 

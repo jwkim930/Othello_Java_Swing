@@ -183,7 +183,9 @@ public class GameFrame extends JFrame implements Rebuildable {
                 SquarePanel square = board.getSquareAt(row, col);
                 square.setBackgroundColor(SquarePanel.MOUSE_ENTERED_COLOR);
                 if (square.getStone() == null) {
-                    square.removeMouseListener(square.getMouseListeners()[0]);
+                    if (board.isInteractable()) {
+                        square.removeMouseListener(square.getMouseListeners()[0]);
+                    }
                 }
                 else if (square.getStone().equals(Stone.WHITE)) {
                     whiteWinningCount++;

@@ -119,8 +119,11 @@ public class SquarePanel extends JPanel implements Rebuildable {
         }
         else {
             this.stone = stone;
-            this.removeMouseListener(this.getMouseListeners()[0]);
-            this.idleBackground();
+            if (Board.getInstance().isInteractable()) {
+                // placed by a player
+                this.removeMouseListener(this.getMouseListeners()[0]);
+                this.idleBackground();
+            }
         }
     }
 
