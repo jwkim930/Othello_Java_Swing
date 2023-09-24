@@ -1,5 +1,6 @@
 package gui;
 
+import ai.AIPlayer;
 import backend.Board;
 import backend.SquareBackgroundManager;
 import exceptions.SingletonAlreadyExistsException;
@@ -43,6 +44,10 @@ public class GameFrame extends JFrame implements Rebuildable {
      * {@code true} if debug mode is enabled.
      */
     private static boolean debug;
+    /**
+     * The AI player to use, if it exists.
+     */
+    private static AIPlayer ai;
 
     /**
      * Initializes the singleton instance of the game window.
@@ -50,14 +55,16 @@ public class GameFrame extends JFrame implements Rebuildable {
      *
      * @param boardSize The size of the game board.
      * @param dbg       If {@code true}, debug mode is enabled.
+     * @param aiPlayer  The AI player to be used. If it is PvP, this should be {@code null}.
      * @throws SingletonAlreadyExistsException If it has already been initialized.
      */
-    public static void initialize(int boardSize, boolean dbg) throws SingletonAlreadyExistsException {
+    public static void initialize(int boardSize, boolean dbg, AIPlayer aiPlayer) throws SingletonAlreadyExistsException {
         if (instance != null) {
             throw new SingletonAlreadyExistsException("The GameFrame has already been initialized.");
         }
         else {
             debug = dbg;
+            ai = aiPlayer;
             instance = new GameFrame(boardSize);
         }
     }
@@ -126,37 +133,35 @@ public class GameFrame extends JFrame implements Rebuildable {
         turnIndicator.add(this.turnIndicatorCircle);
 
         // design skip and finish button
-        Dimension buttonDimension = new Dimension(0, 35);
+        Dimension buttonDimension = new Dimension(80, 40);
 
         JButton skipButton = new JButton("Skip");
         skipButton.setSize(buttonDimension);
         skipButton.setPreferredSize(buttonDimension);
         skipButton.setMinimumSize(buttonDimension);
-        skipButton.addActionListener(event -> this.nextTurn());
+        skipButton.setMaximumSize(buttonDimension);
+        skipButton.addActionListener(event -> {
+            this.nextTurn();
+            ai.makeMove();
+        });
 
         JButton finishButton = new JButton("Finish");
         finishButton.setSize(buttonDimension);
         finishButton.setPreferredSize(buttonDimension);
         finishButton.setMinimumSize(buttonDimension);
-        finishButton.setMinimumSize(buttonDimension);
+        finishButton.setMaximumSize(buttonDimension);
         finishButton.addActionListener(event -> finishGame());
 
         // assemble the bottom row
-        GroupLayout bottomRowLayout = new GroupLayout(this.bottomRowPanel);
-        this.bottomRowPanel.setLayout(bottomRowLayout);
-        bottomRowLayout.setHorizontalGroup(bottomRowLayout.createSequentialGroup()
-                .addGap(270)
-                .addComponent(turnIndicator).addGap(150)
-                .addComponent(skipButton).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(finishButton)
-        );
-        bottomRowLayout.setVerticalGroup(bottomRowLayout.createSequentialGroup()
-                .addGroup(bottomRowLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(turnIndicator)
-                        .addComponent(skipButton)
-                        .addComponent(finishButton)
-                )
-        );
+        this.bottomRowPanel.setLayout(new BoxLayout(this.bottomRowPanel, BoxLayout.LINE_AXIS));
+        this.bottomRowPanel.add(Box.createHorizontalStrut((245)));
+        this.bottomRowPanel.add(turnIndicator);
+        this.bottomRowPanel.add(Box.createHorizontalStrut(65));
+        this.bottomRowPanel.add(skipButton);
+        this.bottomRowPanel.add(Box.createHorizontalStrut(10));
+        this.bottomRowPanel.add(finishButton);
+
+        this.revalidate();
     }
 
     /**
@@ -168,6 +173,8 @@ public class GameFrame extends JFrame implements Rebuildable {
         board.nextTurn();
         this.turnIndicatorCircle = this.createIndicatorCircle(board.getTurn());
         this.rebuild();
+        // invoke AI to make a move
+        ai.makeMove();
     }
 
     /**
@@ -224,37 +231,32 @@ public class GameFrame extends JFrame implements Rebuildable {
         winnerIndicator.add(winnerLabel);
 
         // design the restart and exit buttons
-        Dimension buttonDimension = new Dimension(0, 35);
+        Dimension buttonDimension = new Dimension(80, 40);
 
         JButton restartButton = new JButton("Restart");
         restartButton.setSize(buttonDimension);
         restartButton.setPreferredSize(buttonDimension);
         restartButton.setMinimumSize(buttonDimension);
+        restartButton.setMaximumSize(buttonDimension);
         restartButton.addActionListener(event -> this.restart());
 
         JButton exitButton = new JButton("Exit");
         exitButton.setSize(buttonDimension);
         exitButton.setPreferredSize(buttonDimension);
         exitButton.setMinimumSize(buttonDimension);
-        exitButton.setMinimumSize(buttonDimension);
+        exitButton.setMaximumSize(buttonDimension);
         exitButton.addActionListener(event -> this.dispose());
 
         // assemble the bottom row
-        GroupLayout bottomRowLayout = new GroupLayout(this.bottomRowPanel);
-        this.bottomRowPanel.setLayout(bottomRowLayout);
-        bottomRowLayout.setHorizontalGroup(bottomRowLayout.createSequentialGroup()
-                .addGap(270)
-                .addComponent(winnerIndicator).addGap(93)
-                .addComponent(restartButton).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exitButton)
-        );
-        bottomRowLayout.setVerticalGroup(bottomRowLayout.createSequentialGroup()
-                .addGroup(bottomRowLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(winnerIndicator)
-                        .addComponent(restartButton)
-                        .addComponent(exitButton)
-                )
-        );
+        this.bottomRowPanel.setLayout(new BoxLayout(this.bottomRowPanel, BoxLayout.LINE_AXIS));
+        this.bottomRowPanel.add(Box.createHorizontalStrut((220)));
+        this.bottomRowPanel.add(winnerIndicator);
+        this.bottomRowPanel.add(Box.createHorizontalStrut(60));
+        this.bottomRowPanel.add(restartButton);
+        this.bottomRowPanel.add(Box.createHorizontalStrut(10));
+        this.bottomRowPanel.add(exitButton);
+
+        this.revalidate();
         // if in debug mode, close debug window
         if (isDebugMode()) {
             DebugFrame.getInstance().dispose();
@@ -312,5 +314,27 @@ public class GameFrame extends JFrame implements Rebuildable {
      */
     public static boolean isDebugMode() {
         return debug;
+    }
+
+    /**
+     * Returns the AI player.
+     *
+     * @return The AI player.
+     */
+    public static AIPlayer getAI() {
+        return ai;
+    }
+
+    /**
+     * Enables/disables the skip/finish button on the bottom of the game frame.
+     *
+     * @param currentlyInteractable The current interactability state. If {@code true},
+     *                              the buttons will be disabled and vice versa.
+     */
+    public void toggleButtonInteractable(boolean currentlyInteractable) {
+        JButton skipButton = (JButton) this.bottomRowPanel.getComponent(3);
+        JButton finishButton = (JButton) this.bottomRowPanel.getComponent(5);
+        skipButton.setEnabled(!currentlyInteractable);
+        finishButton.setEnabled(!currentlyInteractable);
     }
 }

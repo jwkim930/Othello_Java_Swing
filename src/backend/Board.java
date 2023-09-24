@@ -263,6 +263,7 @@ public class Board {
     public void toggleInteractable() {
         if (this.interactable) {
             // disable player interaction
+            // disable square interaction
             for (int row = 0; row < this.size; row++) {
                 for (int col = 0; col < this.size; col++) {
                     SquarePanel square = this.getSquareAt(row, col);
@@ -272,10 +273,13 @@ public class Board {
                     }
                 }
             }
+            // disable button interaction
+            GameFrame.getInstance().toggleButtonInteractable(true);
             this.interactable = false;
         }
         else {
             // enable player interaction
+            // enable square interaction
             for (int row = 0; row < this.size; row++) {
                 for (int col = 0; col < this.size; col++) {
                     SquarePanel square = this.getSquareAt(row, col);
@@ -285,6 +289,8 @@ public class Board {
                     }
                 }
             }
+            // enable button interaction
+            GameFrame.getInstance().toggleButtonInteractable(false);
             this.interactable = true;
         }
     }

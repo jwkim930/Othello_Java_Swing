@@ -1,11 +1,15 @@
 package gui;
 
+import ai.AIPlayer;
+import ai.NoAI;
+import ai.Randomazo;
 import backend.Board;
 import listeners.DebugMouseListener;
 import entities.Stone;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
 
 /**
  * A window responsible for the initial setup. The board size is
@@ -28,7 +32,7 @@ public class StartupFrame extends JFrame {
     /** The horizontal size of the window in pixels */
     public final static int SIZE_X = 400;
     /** The vertical size of the window in pixels */
-    public final static int SIZE_Y = 200;
+    public final static int SIZE_Y = 250;
     /** Minimum board size */
     private final static int SIZE_MIN = 4;
     /** Maximum board size */
@@ -38,6 +42,7 @@ public class StartupFrame extends JFrame {
     /** If {@code true}, debug mode is enabled.
       * Click and hold the title text for three seconds to enable this. */
     private boolean debug = false;
+    private String playOption;
 
     /**
      * Initializes the startup window.
@@ -83,6 +88,52 @@ public class StartupFrame extends JFrame {
         // Empty space for spacing
         this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
 
+        // Play options
+        JPanel playOptionPanel = new JPanel();
+        playOptionPanel.setLayout(new BoxLayout(playOptionPanel, BoxLayout.LINE_AXIS));
+        JCheckBox pvpCheckbox = new JCheckBox("PvP", true);
+        JCheckBox vsAIFirstCheckbox = new JCheckBox("vs AI, move first", false);
+        JCheckBox vsAILaterCheckbox = new JCheckBox("vs AI, move later", false);
+        pvpCheckbox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                vsAIFirstCheckbox.setSelected(false);
+                vsAIFirstCheckbox.setEnabled(true);
+                vsAILaterCheckbox.setSelected(false);
+                vsAILaterCheckbox.setEnabled(true);
+                pvpCheckbox.setEnabled(false);
+                this.playOption = "pvp";
+            }
+        });
+        vsAIFirstCheckbox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                pvpCheckbox.setSelected(false);
+                pvpCheckbox.setEnabled(true);
+                vsAILaterCheckbox.setSelected(false);
+                vsAILaterCheckbox.setEnabled(true);
+                vsAIFirstCheckbox.setEnabled(false);
+                this.playOption = "random_first";
+            }
+        });
+        vsAILaterCheckbox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                pvpCheckbox.setSelected(false);
+                pvpCheckbox.setEnabled(true);
+                vsAIFirstCheckbox.setSelected(false);
+                vsAIFirstCheckbox.setEnabled(true);
+                vsAILaterCheckbox.setEnabled(false);
+                this.playOption = "random_later";
+            }
+        });
+        this.playOption = "pvp";
+        pvpCheckbox.setEnabled(false);
+        playOptionPanel.add(pvpCheckbox);
+        playOptionPanel.add(vsAIFirstCheckbox);
+        playOptionPanel.add(vsAILaterCheckbox);
+        this.add(playOptionPanel);
+
+        // Empty space for spacing
+        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
+
         // Start button
         this.startButton = new JButton("Start");
         this.startButton.setAlignmentX(0.5f);
@@ -96,7 +147,14 @@ public class StartupFrame extends JFrame {
      * @param size The size of the game board.
      */
     public void startGame(int size) {
-        GameFrame.initialize(size, this.debug);
+        // determine the AI player to use
+        AIPlayer ai = null;
+        switch (this.playOption) {
+            case "pvp" -> ai = new NoAI();
+            case "random_first" -> ai = new Randomazo(Stone.WHITE);
+            case "random_later" -> ai = new Randomazo(Stone.BLACK);
+        }
+        GameFrame.initialize(size, this.debug, ai);
         JFrame frame = GameFrame.getInstance();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
@@ -131,6 +189,8 @@ public class StartupFrame extends JFrame {
         board.getSquareAt(topLeft + 1, topLeft + 1).place(Stone.WHITE);
 
         this.dispose();
+        // invoke AI to make a move
+        ai.makeMove();
     }
 
     /**

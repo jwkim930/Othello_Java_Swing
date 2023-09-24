@@ -180,7 +180,7 @@ public class DebugFrame extends JFrame {
             worker.start();
         };
         randomMoveButton.addActionListener(e -> {
-            boolean success = this.makeRandomMove();
+            boolean success = makeRandomMove();
             if (success) {
                 showTextInLabelThenDisappear.accept(randomMoveResultLabel, "Success");
             }
@@ -359,10 +359,12 @@ public class DebugFrame extends JFrame {
     /**
      * Makes a random move, placing the current stone in a valid square.
      * If no stone can be placed, this does nothing.
+     * This uses {@code placeStone()} in {@code Board}, so upon a successful
+     * placement, the turn is changed automatically.
      *
      * @return {@code true} if a stone was placed, {@code false} otherwise.
      */
-    public boolean makeRandomMove() {
+    public static boolean makeRandomMove() {
         int size = Board.getInstance().getSize();
         // create a list of coordinates, then shuffle order to simulate random choices
         List<int[]> coordinates = new ArrayList<>();
