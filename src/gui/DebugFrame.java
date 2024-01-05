@@ -206,7 +206,7 @@ public class DebugFrame extends JFrame {
      * Update the turn indicator to the current turn number.
      */
     private void updateTurnIndicator() {
-        int currentTurn = this.moveHistories == null ? 1 : this.moveHistories.currentPosition() + 2;
+        int currentTurn = this.moveHistories == null ? 1 : this.moveHistories.getCurrentPosition() + 2;
         int totalTurn = this.moveHistories == null ? 1 : this.moveHistories.size() + 1;
         this.turnIndicator.setText("Current Turn count: " + currentTurn + "/" + totalTurn);
     }
@@ -295,49 +295,49 @@ public class DebugFrame extends JFrame {
      *             {@code false} if going to the move before.
      */
     private void goToAdjacentMove(boolean next) {
+        if (this.moveHistories == null) {
+            return;
+        }
         if (this.showMove) {
             this.clearMoveHighlights();
         }
         Board board = Board.getInstance();
-        try {
-            boolean changeTurn;
-            if (next) {
-                MoveHistory move = this.moveHistories.next();
-                Stone stone = move.getStone();
-                int[] placeCoor = move.getLocation();
-                board.getSquareAt(placeCoor[0], placeCoor[1]).place(stone);
-                for (int[] flipCoor : move.getFlipped()) {
-                    board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
-                }
-                // peek into the next move to see what stone was placed in it
-                if (!this.moveHistories.atLastMove()) {
-                    changeTurn = !this.moveHistories.next().getStone().equals(board.getTurn());
-                    this.moveHistories.previous();
-                }
-                else {
-                    changeTurn = !this.lastStoneSelectedBefore.equals(board.getTurn());
-                    this.lastStoneSelectedBefore = null;
-                }
-            } else {
-                Stone stoneOnScreen = board.getTurn();
-                if (this.moveHistories.atLastMove()) {
-                    this.lastStoneSelectedBefore = stoneOnScreen;
-                }
-                MoveHistory move = this.moveHistories.current();
-                changeTurn = !move.getStone().equals(stoneOnScreen);
-                int[] placeCoor = move.getLocation();
-                board.getSquareAt(placeCoor[0], placeCoor[1]).remove();
-                for (int[] flipCoor : move.getFlipped()) {
-                    board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
-                }
-                this.moveHistories.previous();
+        boolean changeTurn = false;
+        if (next && !this.moveHistories.atLastMove()) {
+            MoveHistory move = this.moveHistories.next();
+            Stone stone = move.getStone();
+            int[] placeCoor = move.getLocation();
+            board.getSquareAt(placeCoor[0], placeCoor[1]).place(stone);
+            for (int[] flipCoor : move.getFlipped()) {
+                board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
             }
-            if (changeTurn) {
-                GameFrame.getInstance().nextTurn();
+            // peek into the next move to see what stone was placed in it
+            MoveHistory nextMove = this.moveHistories.peekNext();
+            if (nextMove != null) {
+                changeTurn = !nextMove.getStone().equals(board.getTurn());
+            }
+            else {
+                // moved into the last move, restore the stone before using the time machine
+                changeTurn = !this.lastStoneSelectedBefore.equals(board.getTurn());
+                this.lastStoneSelectedBefore = null;
             }
         }
-        catch (NullPointerException e) {
-            // next/previous move does not exist, do nothing
+        if (!next && !this.moveHistories.atBeforeFirstMove()) {
+            Stone stoneOnScreen = board.getTurn();
+            if (this.moveHistories.atLastMove()) {
+                // remember the stone selected for later restoration
+                this.lastStoneSelectedBefore = stoneOnScreen;
+            }
+            MoveHistory move = this.moveHistories.previous();
+            changeTurn = !move.getStone().equals(stoneOnScreen);
+            int[] placeCoor = move.getLocation();
+            board.getSquareAt(placeCoor[0], placeCoor[1]).remove();
+            for (int[] flipCoor : move.getFlipped()) {
+                board.getSquareAt(flipCoor[0], flipCoor[1]).flip();
+            }
+        }
+        if (changeTurn) {
+            GameFrame.getInstance().nextTurn();
         }
         if (this.showMove) {
             this.drawMoveHighlights();
@@ -353,7 +353,7 @@ public class DebugFrame extends JFrame {
      *         behaviour), and {@code false} otherwise.
      */
     public boolean shouldChangeTurn() {
-        return !dontChangeTurn;
+        return !this.dontChangeTurn;
     }
 
     /**

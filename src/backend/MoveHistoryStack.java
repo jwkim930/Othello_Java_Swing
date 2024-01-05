@@ -52,40 +52,39 @@ public class MoveHistoryStack {
      *                were flipped from this move.
      */
     public void push(Stone stone, int row, int col, int[][] flipped) {
-        if (this.currentPosition != this.histories.size()) {
-            this.histories.subList(this.currentPosition + 1, this.histories.size()).clear();
+        if (!this.atLastMove()) {
+            this.histories.subList(this.currentPosition + 1, this.size()).clear();
         }
         this.histories.add(new MoveHistory(stone, row, col, flipped));
         this.currentPosition++;
     }
 
     /**
-     * Returns the move before the current move.
-     * This also shifts the current position
-     * unless it is before the first move.
+     * Returns the current move, then moves the current reading position backward.
+     * This has no effect if we're currently at the state before the first move.
+     * Note that the "current" move is the move that caused the current state of the board.
+     * That is, it returns the move that, when applied in reverse, will restore the state
+     * of the board one move ago.
      *
-     * @return The move before the current move.
-     *         {@code null} if it is the first move or before.
+     * @return The current move. {@code null} if the current position is before the first move.
      */
     public MoveHistory previous() {
-        if (this.currentPosition >= 0) {
+        MoveHistory move = this.current();
+        if (!this.atBeforeFirstMove()) {
             this.currentPosition--;
         }
-        if (this.currentPosition > -1) {
-            return this.histories.get(this.currentPosition);
-        }
-        return null;
+        return move;
     }
 
     /**
-     * Returns the move after the current move.
-     * This also shifts the current position
-     * unless it is the last move.
+     * Returns the move after the current move and shifts the reading position forward.
+     * This has no effect if we're currently at the last move.
+     * Note that the "current" move is the move that caused the current state of the board.
      *
-     * @return The move after the current move. {@code null} if it is the last move.
+     * @return The move after the current move. {@code null} we're at the last move.
      */
     public MoveHistory next() {
-        if (this.currentPosition < this.histories.size() - 1) {
+        if (!this.atLastMove()) {
             this.currentPosition++;
             return this.histories.get(this.currentPosition);
         }
@@ -93,18 +92,30 @@ public class MoveHistoryStack {
     }
 
     /**
-     * Returns the move currently being viewed.
+     * Returns the move after the current move.
+     * Note that the "current" move is the move that caused the current state of the board.
      *
-     * @return The move currently being viewed.
+     * @return The move after the current move. {@code null} if it is the last move.
+     */
+    public MoveHistory peekNext() {
+        if (!this.atLastMove()) {
+            return this.histories.get(this.currentPosition + 1);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the move in the current position in the stack.
+     * This is the move that caused the currently displayed state of the game.
+     *
+     * @return The move made right before the current state.
      *         {@code null} if looking at the state before the first move.
      */
     public MoveHistory current() {
-        if (currentPosition > -1) {
+        if (!atBeforeFirstMove()) {
             return this.histories.get(this.currentPosition);
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -121,16 +132,25 @@ public class MoveHistoryStack {
      *
      * @return The current position.
      */
-    public int currentPosition() {
+    public int getCurrentPosition() {
         return this.currentPosition;
     }
 
     /**
-     * Reports if the current reading position is the last move in the stack.
+     * Reports if the current reading position is at the last move in the stack.
      *
      * @return {@code true} if it is the last move, {@code false} otherwise.
      */
     public boolean atLastMove() {
         return this.currentPosition == this.size() - 1;
+    }
+
+    /**
+     * Reports if the current reading position is at the one before the first move.
+     *
+     * @return {@code true} if it is before the first move, {@code false} otherwise.
+     */
+    public boolean atBeforeFirstMove() {
+        return this.currentPosition == -1;
     }
 }

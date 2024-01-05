@@ -42,6 +42,7 @@ public class StartupFrame extends JFrame {
     /** If {@code true}, debug mode is enabled.
       * Click and hold the title text for three seconds to enable this. */
     private boolean debug = false;
+    /** Specifies the game mode such as PvP and vs AI. */
     private String playOption;
 
     /**

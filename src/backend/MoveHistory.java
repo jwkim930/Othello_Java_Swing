@@ -2,6 +2,8 @@ package backend;
 
 import entities.Stone;
 
+import java.util.Arrays;
+
 /**
  * Records the stone placed and stones flipped in a move.
  */
@@ -69,5 +71,15 @@ public class MoveHistory {
         }
 
         return output;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MoveHistory) {
+            MoveHistory move = (MoveHistory) obj;
+            return Arrays.equals(move.location, this.location) && move.stone.equals(this.stone)
+                    && Arrays.deepEquals(move.flipped, this.flipped);
+        }
+        return false;
     }
 }

@@ -11,10 +11,10 @@ import java.awt.*;
 
 /**
  * An interactable panel that represents a square on the board.
- * May contain a stone. It is no longer (directly) interactable
+ * May contain a stone. It becomes uninteractable by the user
  * if there is a stone.
  */
-public class SquarePanel extends JPanel implements Rebuildable {
+public class SquarePanel extends JPanel {
     /**
      * The stone on this square. {@code null} if there is no stone.
      */
@@ -70,6 +70,9 @@ public class SquarePanel extends JPanel implements Rebuildable {
         }
     }
 
+    /**
+     * Refresh the view to show the latest information.
+     */
     public void rebuild() {
         this.repaint();
     }

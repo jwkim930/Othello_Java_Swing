@@ -15,7 +15,7 @@ import java.awt.*;
  * This class uses a singleton pattern. Use initialize() in the beginning
  * and getInstance() to access it.
  */
-public class GameFrame extends JFrame implements Rebuildable {
+public class GameFrame extends JFrame {
     /**
      * The singleton instance of this class.
      */
@@ -45,7 +45,7 @@ public class GameFrame extends JFrame implements Rebuildable {
      */
     private static boolean debug;
     /**
-     * The AI player to use, if it exists.
+     * The AI player to use.
      */
     private static AIPlayer ai;
 
@@ -55,7 +55,7 @@ public class GameFrame extends JFrame implements Rebuildable {
      *
      * @param boardSize The size of the game board.
      * @param dbg       If {@code true}, debug mode is enabled.
-     * @param aiPlayer  The AI player to be used. If it is PvP, this should be {@code null}.
+     * @param aiPlayer  The AI player to be used.
      * @throws SingletonAlreadyExistsException If it has already been initialized.
      */
     public static void initialize(int boardSize, boolean dbg, AIPlayer aiPlayer) throws SingletonAlreadyExistsException {
@@ -119,6 +119,9 @@ public class GameFrame extends JFrame implements Rebuildable {
         this.add(this.bottomRowPanel);
     }
 
+    /**
+     * Refresh the view to show the latest information.
+     */
     public void rebuild() {
         // only the turn indicator need to be updated
         // update the entire bottom row for this
