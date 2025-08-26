@@ -13,12 +13,13 @@ public class NoAI extends AIPlayer {
     }
 
     /**
-     * The AI player tries to make a move.
-     * It should skip to the next turn if it cannot make a move.
-     * Can be called when it's not the AI's turn, in which case
-     * this has no effect.
-     * 
-     * For this class, this has no effect.
+     * Finds a move for this AI player.
+     * For NoAI, this always returns null since it doesn't make moves.
+     *
+     * @return Always null, as NoAI doesn't make moves.
      */
-    public void makeMove() {}
+    @Override
+    public int[] findMove() {
+        return null;
+    }
 }

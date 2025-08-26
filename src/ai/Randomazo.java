@@ -2,8 +2,10 @@ package ai;
 
 import backend.Board;
 import entities.Stone;
-import gui.DebugFrame;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * He will essentially press every square available until it makes a move.
@@ -18,31 +20,44 @@ public class Randomazo extends AIPlayer {
     public Randomazo(Stone stone) {
         super(stone);
     }
+
+    @Override
+    public int[] findMove() {
+        return findRandomMove(this.stone);
+    }
+
     /**
-     * The AI player tries to make a move.
-     * It should skip to the next turn if it cannot make a move.
-     * Can be called when it's not the AI's turn, in which case
-     * this has no effect.
+     * Finds a random valid move for the specified stone.
      *
-     * For Mr. Randomazo, this is always a random move.
+     * @param stone The stone to find a move for.
+     * @return An array [row, col] representing the coordinate
+     *         of a valid square to place the stone, or {@code null} if no valid move exists.
      */
-    public void makeMove() {
+    public static int[] findRandomMove(Stone stone) {
         Board board = Board.getInstance();
-        Thread worker = new Thread(() -> {
-            board.toggleInteractable();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        int size = board.getSize();
+
+        // Create a list of coordinates, then shuffle order to simulate random choices
+        List<int[]> coordinates = new ArrayList<>();
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                int[] ar = {row, col};
+                coordinates.add(ar);
             }
-            if (!DebugFrame.makeRandomMove()) {
-                // couldn't make a move, skip manually
-                board.nextTurn();
-            }
-            board.toggleInteractable();
-        });
-        if (board.getTurn().equals(this.stone)) {
-            worker.start();
         }
+        Collections.shuffle(coordinates);
+
+        // Go through the list and check for valid moves
+        for (int[] coor : coordinates) {
+            int row = coor[0], col = coor[1];
+            // Check if this would be a valid move
+            if (board.getSquareAt(row, col).getStone() == null &&
+                    board.getFlippingDirections(stone, row, col).length > 0) {
+                return new int[]{row, col};
+            }
+        }
+
+        // No valid move found
+        return null;
     }
 }

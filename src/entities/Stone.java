@@ -1,6 +1,6 @@
 package entities;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * Represents a stone. Can be either black or white.

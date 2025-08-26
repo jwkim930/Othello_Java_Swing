@@ -44,6 +44,38 @@ public class StartupFrame extends JFrame {
     private boolean debug = false;
     /** Specifies the game mode such as PvP and vs AI. */
     private String playOption;
+    /** The scale factor used for size scaling. */
+    private static double scaleFactor;
+
+    /**
+     * Calculates the scale factor based on screen height compared to 1080p
+     * and saves it to the static variable.
+     * If the screen is vertical (i.e. longer vertically than horizontally),
+     * then the width will be used instead.
+     */
+    public static void setScaleFactor() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        scaleFactor = Math.min(screenSize.getWidth(), screenSize.getHeight()) / 1080.0;
+    }
+
+    /**
+     * Returns the scale factor used for size scaling.
+     *
+     * @return The scale factor that can be multiplied to scale any dimension.
+     */
+    public static double getScaleFactor() {
+        return scaleFactor;
+    }
+
+    /**
+     * Scales a dimension value based on the screen scale factor.
+     *
+     * @param baseValue The value to be scaled.
+     * @return The scaled value.
+     */
+    public static int scale(int baseValue) {
+        return (int) (baseValue * getScaleFactor());
+    }
 
     /**
      * Initializes the startup window.
@@ -77,10 +109,12 @@ public class StartupFrame extends JFrame {
         sizeLabel.setAlignmentX(0.5f);
         // slider values are divided and then multiplied by 2 so that only even number can be used
         JSlider sizeSlider = new JSlider(SIZE_MIN / 2, SIZE_MAX / 2, SIZE_INITIAL / 2);
-        sizeSlider.setSize(new Dimension((int) (SIZE_X * 0.8), 18));
-        sizeSlider.setPreferredSize(new Dimension((int) (SIZE_X * 0.8), 18));
-        sizeSlider.setMinimumSize(new Dimension((int) (SIZE_X * 0.8), 18));
-        sizeSlider.setMaximumSize(new Dimension((int) (SIZE_X * 0.8), 18));
+        int sliderWidth = (int) (SIZE_X * 0.8);
+        int sliderHeight = 18;
+        sizeSlider.setSize(new Dimension(sliderWidth, sliderHeight));
+        sizeSlider.setPreferredSize(new Dimension(sliderWidth, sliderHeight));
+        sizeSlider.setMinimumSize(new Dimension(sliderWidth, sliderHeight));
+        sizeSlider.setMaximumSize(new Dimension(sliderWidth, sliderHeight));
         sizeSlider.addChangeListener(e -> sizeLabel.setText("Board size: " + sizeSlider.getValue() * 2));
         this.sizeSliderPanel.add(sizeLabel);
         this.sizeSliderPanel.add(sizeSlider);

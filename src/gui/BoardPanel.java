@@ -4,6 +4,8 @@ import javax.swing.*;
 
 import backend.Board;
 
+import static gui.StartupFrame.scale;
+
 import java.awt.*;
 
 /**
@@ -11,9 +13,15 @@ import java.awt.*;
  */
 public class BoardPanel extends JPanel {
     /**
-     * The width/height of this panel in pixels.
+     * Base width/height for 1080p.
      */
-    public static final int SIZE = 650;
+    private final static int BASE_SIZE = 650;
+
+    /**
+     * The scaled width/height of this panel in pixels.
+     */
+    public static final int SIZE = scale(BASE_SIZE);
+
 
     /**
      * Initializes the panel. Should only be called once in the beginning.

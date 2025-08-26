@@ -7,6 +7,8 @@ import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 import entities.Stone;
 
+import static gui.StartupFrame.scale;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -33,13 +35,21 @@ public class GameFrame extends JFrame {
      */
     private JPanel turnIndicatorCircle;
     /**
+     * Base width for 1080p.
+     */
+    private final static int BASE_SIZE_X = 800;
+    /**
+     * Base height for 1080p.
+     */
+    private final static int BASE_SIZE_Y = 800;
+    /**
      * The width of the window in pixels.
      */
-    public final static int SIZE_X = 800;
+    public final static int SIZE_X = scale(BASE_SIZE_X);
     /**
      * The height of the window in pixels.
      */
-    public final static int SIZE_Y = 800;
+    public final static int SIZE_Y = scale(BASE_SIZE_Y);
     /**
      * {@code true} if debug mode is enabled.
      */
@@ -101,14 +111,14 @@ public class GameFrame extends JFrame {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
         // add an empty space above
-        this.add(Box.createRigidArea(new Dimension(0, 30)));
+        this.add(Box.createRigidArea(new Dimension(0, scale(30))));
 
         // add BoardPanel
         this.boardPanel = new BoardPanel(boardSize);
         this.add(this.boardPanel);
 
         // add an empty space below
-        this.add(Box.createRigidArea(new Dimension(0, 20)));
+        this.add(Box.createRigidArea(new Dimension(0, scale(20))));
 
         // design turn indicator circle
         this.turnIndicatorCircle = this.createIndicatorCircle(Board.getInstance().getTurn());
@@ -131,37 +141,36 @@ public class GameFrame extends JFrame {
         JPanel turnIndicator = new JPanel();
         turnIndicator.setLayout(new BoxLayout(turnIndicator, BoxLayout.LINE_AXIS));
         JLabel turnLabel = new JLabel("Current turn:");
-        turnLabel.setFont(new Font(turnLabel.getFont().getName(), Font.PLAIN, turnLabel.getFont().getSize() * 2));
+        turnLabel.setFont(new Font(turnLabel.getFont().getName(), Font.PLAIN, scale(turnLabel.getFont().getSize() * 2)));
         turnIndicator.add(turnLabel);
         turnIndicator.add(this.turnIndicatorCircle);
 
         // design skip and finish button
-        Dimension buttonDimension = new Dimension(80, 40);
+        Dimension buttonDimension = new Dimension(scale(85), scale(40));
 
         JButton skipButton = new JButton("Skip");
         skipButton.setSize(buttonDimension);
         skipButton.setPreferredSize(buttonDimension);
         skipButton.setMinimumSize(buttonDimension);
         skipButton.setMaximumSize(buttonDimension);
-        skipButton.addActionListener(event -> {
-            this.nextTurn();
-            ai.makeMove();
-        });
+        skipButton.setFont(new Font(skipButton.getFont().getName(), skipButton.getFont().getStyle(), scale(skipButton.getFont().getSize())));
+        skipButton.addActionListener(event -> this.nextTurn());
 
         JButton finishButton = new JButton("Finish");
         finishButton.setSize(buttonDimension);
         finishButton.setPreferredSize(buttonDimension);
         finishButton.setMinimumSize(buttonDimension);
         finishButton.setMaximumSize(buttonDimension);
+        finishButton.setFont(new Font(finishButton.getFont().getName(), finishButton.getFont().getStyle(), scale(finishButton.getFont().getSize())));
         finishButton.addActionListener(event -> finishGame());
 
         // assemble the bottom row
         this.bottomRowPanel.setLayout(new BoxLayout(this.bottomRowPanel, BoxLayout.LINE_AXIS));
-        this.bottomRowPanel.add(Box.createHorizontalStrut((245)));
+        this.bottomRowPanel.add(Box.createHorizontalStrut(scale(245)));
         this.bottomRowPanel.add(turnIndicator);
-        this.bottomRowPanel.add(Box.createHorizontalStrut(65));
+        this.bottomRowPanel.add(Box.createHorizontalStrut(scale(65)));
         this.bottomRowPanel.add(skipButton);
-        this.bottomRowPanel.add(Box.createHorizontalStrut(10));
+        this.bottomRowPanel.add(Box.createHorizontalStrut(scale(10)));
         this.bottomRowPanel.add(finishButton);
 
         this.revalidate();
@@ -221,7 +230,7 @@ public class GameFrame extends JFrame {
         JPanel winnerIndicator = new JPanel();
         winnerIndicator.setLayout(new BoxLayout(winnerIndicator, BoxLayout.LINE_AXIS));
         JLabel winnerLabel = new JLabel();
-        winnerLabel.setFont(new Font(winnerLabel.getFont().getName(), Font.PLAIN, winnerLabel.getFont().getSize() * 2));
+        winnerLabel.setFont(new Font(winnerLabel.getFont().getName(), Font.PLAIN, scale(winnerLabel.getFont().getSize() * 2)));
         if (winner == null) {
             // it's a draw
             winnerLabel.setText("The game is a draw!");
@@ -234,13 +243,14 @@ public class GameFrame extends JFrame {
         winnerIndicator.add(winnerLabel);
 
         // design the restart and exit buttons
-        Dimension buttonDimension = new Dimension(80, 40);
+        Dimension buttonDimension = new Dimension(scale(85), scale(40));
 
         JButton restartButton = new JButton("Restart");
         restartButton.setSize(buttonDimension);
         restartButton.setPreferredSize(buttonDimension);
         restartButton.setMinimumSize(buttonDimension);
         restartButton.setMaximumSize(buttonDimension);
+        restartButton.setFont(new Font(restartButton.getFont().getName(), restartButton.getFont().getStyle(), scale(restartButton.getFont().getSize())));
         restartButton.addActionListener(event -> this.restart());
 
         JButton exitButton = new JButton("Exit");
@@ -248,15 +258,16 @@ public class GameFrame extends JFrame {
         exitButton.setPreferredSize(buttonDimension);
         exitButton.setMinimumSize(buttonDimension);
         exitButton.setMaximumSize(buttonDimension);
+        exitButton.setFont(new Font(exitButton.getFont().getName(), exitButton.getFont().getStyle(), scale(exitButton.getFont().getSize())));
         exitButton.addActionListener(event -> this.dispose());
 
         // assemble the bottom row
         this.bottomRowPanel.setLayout(new BoxLayout(this.bottomRowPanel, BoxLayout.LINE_AXIS));
-        this.bottomRowPanel.add(Box.createHorizontalStrut((220)));
+        this.bottomRowPanel.add(Box.createHorizontalStrut(scale(220)));
         this.bottomRowPanel.add(winnerIndicator);
-        this.bottomRowPanel.add(Box.createHorizontalStrut(60));
+        this.bottomRowPanel.add(Box.createHorizontalStrut(scale(60)));
         this.bottomRowPanel.add(restartButton);
-        this.bottomRowPanel.add(Box.createHorizontalStrut(10));
+        this.bottomRowPanel.add(Box.createHorizontalStrut(scale(10)));
         this.bottomRowPanel.add(exitButton);
 
         this.revalidate();
@@ -277,13 +288,15 @@ public class GameFrame extends JFrame {
             @Override
             public void paintComponent(Graphics g) {
                 // draw a circle of the right color
+                int circleSize = scale(20);
+                int offset = scale(5);
                 g.setColor(stone.getColor());
-                g.fillOval(5, 5, 20, 20);
+                g.fillOval(offset, offset, circleSize, circleSize);
                 g.setColor(Color.BLACK);
-                g.drawOval(5, 5, 20, 20);
+                g.drawOval(offset, offset, circleSize, circleSize);
             }
         };
-        Dimension circleSizeDimension = new Dimension(30, 30);
+        Dimension circleSizeDimension = new Dimension(scale(30), scale(30));
         result.setSize(circleSizeDimension);
         result.setPreferredSize(circleSizeDimension);
         result.setMinimumSize(circleSizeDimension);

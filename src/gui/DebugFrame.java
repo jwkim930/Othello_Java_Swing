@@ -1,15 +1,15 @@
 package gui;
 
+import ai.Randomazo;
 import backend.*;
 import entities.Stone;
 import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 
+import static gui.StartupFrame.scale;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -24,13 +24,22 @@ public class DebugFrame extends JFrame {
      */
     private static DebugFrame instance;
     /**
+     * Base width for 1080p.
+     */
+    private final static int BASE_SIZE_X = 300;
+    /**
+     * Base height for 1080p.
+     */
+    private final static int BASE_SIZE_Y = 250;
+
+    /**
      * The width of the window in pixels.
      */
-    public final static int SIZE_X = 300;
+    public final static int SIZE_X = scale(BASE_SIZE_X);
     /**
      * The height of the window in pixels.
      */
-    public final static int SIZE_Y = 250;
+    public final static int SIZE_Y = scale(BASE_SIZE_Y);
     /**
      * Shows how many turns have passed since the beginning.
      */
@@ -99,11 +108,15 @@ public class DebugFrame extends JFrame {
     private DebugFrame() {
         this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.PAGE_AXIS));
 
-        this.add(Box.createVerticalStrut(5));
+        this.add(Box.createVerticalStrut(scale(5)));
 
         // Text instruction
-        this.add(new JLabel("Right click to place a stone anywhere,"));
-        this.add(new JLabel("regardless of whether it is a valid move."));
+        JLabel instruction1 = new JLabel("Right click to place a stone anywhere,");
+        JLabel instruction2 = new JLabel("regardless of whether it is a valid move.");
+        instruction1.setFont(new Font(instruction1.getFont().getName(), instruction1.getFont().getStyle(), scale(instruction1.getFont().getSize())));
+        instruction2.setFont(new Font(instruction2.getFont().getName(), instruction2.getFont().getStyle(), scale(instruction2.getFont().getSize())));
+        this.add(instruction1);
+        this.add(instruction2);
 
         this.add(Box.createVerticalGlue());
 
@@ -111,10 +124,12 @@ public class DebugFrame extends JFrame {
         this.turnIndicator = new JLabel();
         this.updateTurnIndicator();
         this.turnIndicator.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.turnIndicator.setFont(new Font(this.turnIndicator.getFont().getName(), this.turnIndicator.getFont().getStyle(), scale(this.turnIndicator.getFont().getSize())));
         this.add(this.turnIndicator);
         // Don't change turn checkbox
         this.dontChangeTurn = false;
         JCheckBox dontChangeTurnCheck = new JCheckBox("Don't change turn after making a move");
+        dontChangeTurnCheck.setFont(new Font(dontChangeTurnCheck.getFont().getName(), dontChangeTurnCheck.getFont().getStyle(), scale(dontChangeTurnCheck.getFont().getSize())));
         dontChangeTurnCheck.addActionListener(e -> {
             JCheckBox box = (JCheckBox) e.getSource();
             this.dontChangeTurn = box.isSelected();
@@ -124,20 +139,25 @@ public class DebugFrame extends JFrame {
         this.add(Box.createVerticalGlue());
 
         // Time machine
-        this.add(new JLabel("Time Machine:"));
+        JLabel timeMachineLabel = new JLabel("Time Machine:");
+        timeMachineLabel.setFont(new Font(timeMachineLabel.getFont().getName(), timeMachineLabel.getFont().getStyle(), scale(timeMachineLabel.getFont().getSize())));
+        this.add(timeMachineLabel);
         JPanel timeMachinePanel = new JPanel();
         timeMachinePanel.setLayout(new BoxLayout(timeMachinePanel, BoxLayout.LINE_AXIS));
         JButton prevButton = new JButton("<");
+        prevButton.setFont(new Font(prevButton.getFont().getName(), prevButton.getFont().getStyle(), scale(prevButton.getFont().getSize())));
         prevButton.addActionListener(e -> {
             this.goToAdjacentMove(false);
             this.updateTurnIndicator();
         });
         JButton nextButton = new JButton(">");
+        nextButton.setFont(new Font(nextButton.getFont().getName(), nextButton.getFont().getStyle(), scale(nextButton.getFont().getSize())));
         nextButton.addActionListener(e -> {
             this.goToAdjacentMove(true);
             this.updateTurnIndicator();
         });
         JCheckBox showMoveCheck = new JCheckBox("Show movements");
+        showMoveCheck.setFont(new Font(showMoveCheck.getFont().getName(), showMoveCheck.getFont().getStyle(), scale(showMoveCheck.getFont().getSize())));
         this.showMove = false;
         showMoveCheck.addActionListener(event -> {
             JCheckBox box = (JCheckBox) event.getSource();
@@ -166,7 +186,9 @@ public class DebugFrame extends JFrame {
         randomMovePanel.setLayout(new BoxLayout(randomMovePanel, BoxLayout.LINE_AXIS));
         randomMovePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         JButton randomMoveButton = new JButton("Random Move");
+        randomMoveButton.setFont(new Font(randomMoveButton.getFont().getName(), randomMoveButton.getFont().getStyle(), scale(randomMoveButton.getFont().getSize())));
         JLabel randomMoveResultLabel = new JLabel();
+        randomMoveResultLabel.setFont(new Font(randomMoveResultLabel.getFont().getName(), randomMoveResultLabel.getFont().getStyle(), scale(randomMoveResultLabel.getFont().getSize())));
         BiConsumer<JLabel, String> showTextInLabelThenDisappear = (label, message) -> {
             Thread worker = new Thread(() -> {
                 label.setText(message);
@@ -180,7 +202,12 @@ public class DebugFrame extends JFrame {
             worker.start();
         };
         randomMoveButton.addActionListener(e -> {
-            boolean success = makeRandomMove();
+            Board board = Board.getInstance();
+            int[] move = Randomazo.findRandomMove(board.getTurn());
+            boolean success = false;
+            if (move != null) {
+                success = board.placeStone(move[0], move[1]);
+            }
             if (success) {
                 showTextInLabelThenDisappear.accept(randomMoveResultLabel, "Success");
             }
@@ -196,10 +223,11 @@ public class DebugFrame extends JFrame {
 
         // interaction toggle button
         JButton toggleInteractionButton = new JButton("Toggle Interaction");
+        toggleInteractionButton.setFont(new Font(toggleInteractionButton.getFont().getName(), toggleInteractionButton.getFont().getStyle(), scale(toggleInteractionButton.getFont().getSize())));
         toggleInteractionButton.addActionListener(e -> Board.getInstance().toggleInteractable());
         this.add(toggleInteractionButton);
 
-        this.add(Box.createVerticalStrut(5));
+        this.add(Box.createVerticalStrut(scale(5)));
     }
 
     /**
@@ -354,37 +382,6 @@ public class DebugFrame extends JFrame {
      */
     public boolean shouldChangeTurn() {
         return !this.dontChangeTurn;
-    }
-
-    /**
-     * Makes a random move, placing the current stone in a valid square.
-     * If no stone can be placed, this does nothing.
-     * This uses {@code placeStone()} in {@code Board}, so upon a successful
-     * placement, the turn is changed automatically.
-     *
-     * @return {@code true} if a stone was placed, {@code false} otherwise.
-     */
-    public static boolean makeRandomMove() {
-        int size = Board.getInstance().getSize();
-        // create a list of coordinates, then shuffle order to simulate random choices
-        List<int[]> coordinates = new ArrayList<>();
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
-                int[] ar = {row, col};
-                coordinates.add(ar);
-            }
-        }
-        Collections.shuffle(coordinates);
-        // go through the list and make attempts
-        for (int[] coor : coordinates) {
-            int row = coor[0], col = coor[1];
-            // if attempt was successful, end loop
-            if (Board.getInstance().placeStone(row, col)) {
-                return true;
-            }
-        }
-        // no attempt was successful
-        return false;
     }
 
     /**
