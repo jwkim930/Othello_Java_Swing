@@ -1,8 +1,6 @@
 package gui;
 
-import ai.AIPlayer;
-import ai.NoAI;
-import ai.Randomazo;
+import ai.*;
 import backend.Board;
 import listeners.DebugMouseListener;
 import entities.Stone;
@@ -32,7 +30,7 @@ public class StartupFrame extends JFrame {
     /** The horizontal size of the window in pixels */
     public final static int SIZE_X = 400;
     /** The vertical size of the window in pixels */
-    public final static int SIZE_Y = 250;
+    public final static int SIZE_Y = 300;
     /** Minimum board size */
     private final static int SIZE_MIN = 4;
     /** Maximum board size */
@@ -44,6 +42,8 @@ public class StartupFrame extends JFrame {
     private boolean debug = false;
     /** Specifies the game mode such as PvP and vs AI. */
     private String playOption;
+    /** Specifies the AI model to be used as an opponent. */
+    private String AIOpponent;
     /** The scale factor used for size scaling. */
     private static double scaleFactor;
 
@@ -96,10 +96,6 @@ public class StartupFrame extends JFrame {
         this.title.setFont(titleFont);
         // add debug mode listener
         this.title.addMouseListener(new DebugMouseListener());
-        this.add(this.title);
-
-        // Empty space for spacing
-        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
 
         // Slider
         this.sizeSliderPanel = new JPanel();
@@ -118,10 +114,24 @@ public class StartupFrame extends JFrame {
         sizeSlider.addChangeListener(e -> sizeLabel.setText("Board size: " + sizeSlider.getValue() * 2));
         this.sizeSliderPanel.add(sizeLabel);
         this.sizeSliderPanel.add(sizeSlider);
-        this.add(this.sizeSliderPanel);
 
-        // Empty space for spacing
-        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
+        // AI selection box
+        JPanel AISelectionPanel = new JPanel();
+        AISelectionPanel.setLayout(new BoxLayout(AISelectionPanel, BoxLayout.LINE_AXIS));
+        JLabel AISelectorLabel = new JLabel("AI Opponent: ");
+        AISelectionPanel.add(AISelectorLabel);
+        AISelectorLabel.setEnabled(false);   // disabled since the default option is pvp
+        String[] AIOptions = {"Randomazo", "Hastyn"};
+        this.AIOpponent = "Randomazo";
+        JComboBox<String> AISelector = new JComboBox<>(AIOptions);
+        Dimension selectorSize = new Dimension(scale(200), scale(30));
+        AISelector.setSize(selectorSize);
+        AISelector.setPreferredSize(selectorSize);
+        AISelector.setMaximumSize(selectorSize);
+        AISelector.setMinimumSize(selectorSize);
+        AISelector.addActionListener(e -> this.AIOpponent = (String) AISelector.getSelectedItem());
+        AISelector.setEnabled(false);   // disabled since the default option is pvp
+        AISelectionPanel.add(AISelector);
 
         // Play options
         JPanel playOptionPanel = new JPanel();
@@ -137,6 +147,8 @@ public class StartupFrame extends JFrame {
                 vsAILaterCheckbox.setEnabled(true);
                 pvpCheckbox.setEnabled(false);
                 this.playOption = "pvp";
+                AISelectorLabel.setEnabled(false);
+                AISelector.setEnabled(false);
             }
         });
         vsAIFirstCheckbox.addItemListener(e -> {
@@ -147,6 +159,8 @@ public class StartupFrame extends JFrame {
                 vsAILaterCheckbox.setEnabled(true);
                 vsAIFirstCheckbox.setEnabled(false);
                 this.playOption = "random_first";
+                AISelectorLabel.setEnabled(true);
+                AISelector.setEnabled(true);
             }
         });
         vsAILaterCheckbox.addItemListener(e -> {
@@ -157,6 +171,8 @@ public class StartupFrame extends JFrame {
                 vsAIFirstCheckbox.setEnabled(true);
                 vsAILaterCheckbox.setEnabled(false);
                 this.playOption = "random_later";
+                AISelectorLabel.setEnabled(true);
+                AISelector.setEnabled(true);
             }
         });
         this.playOption = "pvp";
@@ -164,15 +180,21 @@ public class StartupFrame extends JFrame {
         playOptionPanel.add(pvpCheckbox);
         playOptionPanel.add(vsAIFirstCheckbox);
         playOptionPanel.add(vsAILaterCheckbox);
-        this.add(playOptionPanel);
-
-        // Empty space for spacing
-        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
 
         // Start button
         this.startButton = new JButton("Start");
         this.startButton.setAlignmentX(0.5f);
         this.startButton.addActionListener(e -> startGame(((JSlider) this.sizeSliderPanel.getComponent(1)).getValue() * 2));
+
+        // Place the elements and spacings
+        this.add(this.title);
+        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
+        this.add(this.sizeSliderPanel);
+        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 12)));
+        this.add(playOptionPanel);
+        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 16)));
+        this.add(AISelectionPanel);
+        this.add(Box.createRigidArea(new Dimension(0, SIZE_Y / 16)));
         this.add(startButton);
     }
 
@@ -184,10 +206,21 @@ public class StartupFrame extends JFrame {
     public void startGame(int size) {
         // determine the AI player to use
         AIPlayer ai = null;
-        switch (this.playOption) {
-            case "pvp" -> ai = new NoAI();
-            case "random_first" -> ai = new Randomazo(Stone.WHITE);
-            case "random_later" -> ai = new Randomazo(Stone.BLACK);
+        if (this.playOption.equals("pvp")) {
+            ai = new NoAI();
+        }
+        else {
+            Stone aiStone;
+            if (this.playOption.equals("random_first")) {
+                aiStone = Stone.WHITE;
+            }
+            else {
+                aiStone = Stone.BLACK;
+            }
+            switch (this.AIOpponent) {
+                case "Randomazo" -> ai = new Randomazo(aiStone);
+                case "Hastyn" -> ai = new Hastyn(aiStone);
+            }
         }
         GameFrame.initialize(size, this.debug, ai);
         JFrame frame = GameFrame.getInstance();
