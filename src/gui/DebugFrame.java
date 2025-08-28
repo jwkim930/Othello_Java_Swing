@@ -7,9 +7,12 @@ import exceptions.SingletonAlreadyExistsException;
 import exceptions.SingletonNotYetExistsException;
 
 import static gui.StartupFrame.scale;
+import static gui.StartupFrame.setScaleFactor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.function.BiConsumer;
 
 /**
@@ -31,15 +34,6 @@ public class DebugFrame extends JFrame {
      * Base height for 1080p.
      */
     private final static int BASE_SIZE_Y = 250;
-
-    /**
-     * The width of the window in pixels.
-     */
-    public final static int SIZE_X = scale(BASE_SIZE_X);
-    /**
-     * The height of the window in pixels.
-     */
-    public final static int SIZE_Y = scale(BASE_SIZE_Y);
     /**
      * Shows how many turns have passed since the beginning.
      */
@@ -227,6 +221,14 @@ public class DebugFrame extends JFrame {
         toggleInteractionButton.addActionListener(e -> Board.getInstance().toggleInteractable());
         this.add(toggleInteractionButton);
 
+        this.add(Box.createVerticalGlue());
+
+        // save board button
+        JButton saveButton = new JButton("Save Board State");
+        saveButton.setFont(new Font(saveButton.getFont().getName(), saveButton.getFont().getStyle(), scale(saveButton.getFont().getSize())));
+        saveButton.addActionListener(e -> saveBoardState("board.txt"));
+        this.add(saveButton);
+
         this.add(Box.createVerticalStrut(scale(5)));
     }
 
@@ -385,13 +387,55 @@ public class DebugFrame extends JFrame {
     }
 
     /**
+     * @return The scaled width of this window.
+     */
+    public static int getSizeX() {
+        return scale(BASE_SIZE_X);
+    }
+
+    /**
+     * @return The scaled height of this window.
+     */
+    public static int getSizeY() {
+        return scale(BASE_SIZE_Y);
+    }
+
+    /**
+     * Saves the current state of the board into a file.
+     * The first line shows the turn player.
+     * The second line shows the size of the board.
+     * The lines afterward show the state of the board.
+     * Refer to {@code MockBoard.toString} documentation for its format.
+     *
+     * @param path The desired path for the result file.
+     */
+    public static void saveBoardState(String path) {
+        try (PrintWriter out = new PrintWriter(path)) {
+            // just record the current stone and use MockBoard toString
+            MockBoard mBoard = new MockBoard();
+            if (mBoard.getTurn().equals(Stone.BLACK)) {
+                out.println("B");
+            }
+            else {
+                out.println("W");
+            }
+            out.println(mBoard.getSize());
+            out.println(mBoard);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Spawns a debug window. This is mostly for testing the layout.
      */
     public static void main(String[] args) {
+        setScaleFactor();
         DebugFrame.initialize();
         DebugFrame frame = DebugFrame.getInstance();
         frame.setTitle("Debug Menu");
-        frame.setSize(DebugFrame.SIZE_X, DebugFrame.SIZE_Y);
+        frame.setSize(getSizeX(), getSizeY());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }

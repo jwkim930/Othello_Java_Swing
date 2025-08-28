@@ -2,6 +2,7 @@ package tests;
 
 import backend.Board;
 import entities.Direction;
+import gui.SquarePanel;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,5 +64,7 @@ public class DirectionUnitTest {
         assertNull(Direction.LEFT.moveThisWay(2, 0));
         assertNull(Direction.TOP_LEFT.moveThisWay(2, 0));
         assertNull(Direction.TOP_LEFT.moveThisWay(0, 2));
+        Board.reset();
+        SquarePanel.resetSquareSize();
     }
 }

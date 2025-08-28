@@ -43,14 +43,6 @@ public class GameFrame extends JFrame {
      */
     private final static int BASE_SIZE_Y = 800;
     /**
-     * The width of the window in pixels.
-     */
-    public final static int SIZE_X = scale(BASE_SIZE_X);
-    /**
-     * The height of the window in pixels.
-     */
-    public final static int SIZE_Y = scale(BASE_SIZE_Y);
-    /**
      * {@code true} if debug mode is enabled.
      */
     private static boolean debug;
@@ -330,6 +322,20 @@ public class GameFrame extends JFrame {
      */
     public static boolean isDebugMode() {
         return debug;
+    }
+
+    /**
+     * @return The scaled width of the window in pixels.
+     */
+    public static int getSizeX() {
+        return scale(BASE_SIZE_X);
+    }
+
+    /**
+     * @return The scaled height of this window in pixels.
+     */
+    public static int getSizeY() {
+        return scale(BASE_SIZE_Y);
     }
 
     /**

@@ -49,7 +49,7 @@ public class Board {
         this.size = size;
         this.interactable = true;
         this.squares = new SquarePanel[size][size];
-        int sqSize = BoardPanel.SIZE / size;
+        int sqSize = BoardPanel.getPanelSize() / size;
         SquarePanel.setSquareSize(sqSize);
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {

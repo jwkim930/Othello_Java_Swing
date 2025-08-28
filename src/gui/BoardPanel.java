@@ -17,11 +17,6 @@ public class BoardPanel extends JPanel {
      */
     private final static int BASE_SIZE = 650;
 
-    /**
-     * The scaled width/height of this panel in pixels.
-     */
-    public static final int SIZE = scale(BASE_SIZE);
-
 
     /**
      * Initializes the panel. Should only be called once in the beginning.
@@ -32,7 +27,7 @@ public class BoardPanel extends JPanel {
         super();
         Board.initialize(boardSize);
         this.setLayout(new GridLayout(boardSize, boardSize));
-        Dimension sizeDimension = new Dimension(SIZE, SIZE);
+        Dimension sizeDimension = new Dimension(getPanelSize(), getPanelSize());
         this.setSize(sizeDimension);
         this.setPreferredSize(sizeDimension);
         this.setMinimumSize(sizeDimension);
@@ -45,5 +40,12 @@ public class BoardPanel extends JPanel {
                 this.add(square);
             }
         }
+    }
+
+    /**
+     * @return The scaled base width/height of this panel in pixels.
+     */
+    public static int getPanelSize() {
+        return scale(BASE_SIZE);
     }
 }

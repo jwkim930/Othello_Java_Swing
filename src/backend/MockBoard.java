@@ -4,8 +4,12 @@ import entities.Direction;
 import entities.Stone;
 import exceptions.SingletonNotYetExistsException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * A lightweight version of Board for AI simulations.
@@ -59,6 +63,75 @@ public class MockBoard {
                 this.squares[row][col] = squares[row][col];
             }
         }
+    }
+
+    /**
+     * Private constructor for parsing from a text file.
+     *
+     * @param path The path to the text file.
+     */
+    private MockBoard(String path) {
+        try (Scanner scanner = new Scanner(new File(path))) {
+            String turn = scanner.nextLine();
+            if (turn.equals("B")) {
+                this.turn = Stone.BLACK;
+            }
+            else {
+                this.turn = Stone.WHITE;
+            }
+            int size = Integer.parseInt(scanner.nextLine());
+            this.squares = new Stone[size][size];
+            for (int row = 0; row < size; row++) {
+                String line = scanner.nextLine();
+                for (int col = 0; col < size; col++) {
+                    char at = line.charAt(col);
+                    if (at == 'B') {
+                        this.squares[row][col] = Stone.BLACK;
+                    }
+                    else if (at == 'W') {
+                        this.squares[row][col] = Stone.WHITE;
+                    }
+                }
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof MockBoard other) {
+            return Arrays.deepEquals(this.squares, other.squares) && this.turn.equals(other.turn);
+        }
+        return false;
+    }
+
+    /**
+     * Returns the string representation of this object.
+     * A black stone is marked with B, a white stone is marked with W,
+     * and an empty square is marked with *.
+     *
+     * @return The string representation of this MockBoard.
+     */
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (int row = 0; row < this.getSize(); row++) {
+            for (int col = 0; col < this.getSize(); col++) {
+                String squareString = "*";
+                if (Stone.BLACK.equals(this.getStoneAt(row, col))) {
+                    squareString = "B";
+                }
+                else if (Stone.WHITE.equals(this.getStoneAt(row, col))) {
+                    squareString = "W";
+                }
+                result.append(squareString);
+            }
+            result.append("\n");
+        }
+        result.deleteCharAt(result.length() - 1);
+        return result.toString();
     }
 
     /**
@@ -192,5 +265,55 @@ public class MockBoard {
      */
     public int getSize() {
         return this.squares.length;
+    }
+
+    /**
+     * Returns all moves that will flip at least one stone.
+     *
+     * @return The moves that will flip at least one stone.
+     *         Feel free to modify this list since it's not used anywhere else.
+     */
+    public List<int[]> getValidMoves() {
+        List<int[]> validMoves = new ArrayList<>();
+        // just try every empty square
+        for (int row = 0; row < this.getSize(); row++) {
+            for (int col = 0; col < this.getSize(); col++) {
+                if (this.getStoneAt(row, col) == null && this.getFlippingDirections(this.turn, row, col).length > 0) {
+                    validMoves.add(new int[] {row, col});
+                }
+            }
+        }
+        return validMoves;
+    }
+
+    /**
+     * Count the number of a particular stone on the board.
+     *
+     * @param stone The stone to be counted.
+     * @return The number of that stone.
+     */
+    public int countStones(Stone stone) {
+        int count = 0;
+        for (int row = 0; row < this.getSize(); row++) {
+            for (int col = 0; col < this.getSize(); col++) {
+                if (stone.equals(this.squares[row][col])) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Create the object instance from a text file.
+     * Refer to the {@code DebugFrame.saveBoardState}
+     * documentation for file formatting.
+     *
+     * @param path The path to the text file.
+     * @return The {@code MockBoard} instance copying
+     * the state in the file.
+     */
+    public static MockBoard parse(String path) {
+        return new MockBoard(path);
     }
 }

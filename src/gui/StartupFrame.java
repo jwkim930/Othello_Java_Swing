@@ -121,7 +121,7 @@ public class StartupFrame extends JFrame {
         JLabel AISelectorLabel = new JLabel("AI Opponent: ");
         AISelectionPanel.add(AISelectorLabel);
         AISelectorLabel.setEnabled(false);   // disabled since the default option is pvp
-        String[] AIOptions = {"Randomazo", "Hastyn"};
+        String[] AIOptions = {"Randomazo", "Hastyn", "Oracina"};
         this.AIOpponent = "Randomazo";
         JComboBox<String> AISelector = new JComboBox<>(AIOptions);
         Dimension selectorSize = new Dimension(scale(200), scale(30));
@@ -220,16 +220,17 @@ public class StartupFrame extends JFrame {
             switch (this.AIOpponent) {
                 case "Randomazo" -> ai = new Randomazo(aiStone);
                 case "Hastyn" -> ai = new Hastyn(aiStone);
+                case "Oracina" -> ai = new Oracina(aiStone, 3);
             }
         }
         GameFrame.initialize(size, this.debug, ai);
         JFrame frame = GameFrame.getInstance();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(GameFrame.SIZE_X, GameFrame.SIZE_Y);
+        frame.setSize(GameFrame.getSizeX(), GameFrame.getSizeY());
         // place window in the middle of the screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int locationX = (int) (screenSize.getWidth() - GameFrame.SIZE_X) / 2;
-        int locationY = (int) (screenSize.getHeight() - GameFrame.SIZE_Y) / 2;
+        int locationX = (int) (screenSize.getWidth() - GameFrame.getSizeX()) / 2;
+        int locationY = (int) (screenSize.getHeight() - GameFrame.getSizeY()) / 2;
         frame.setLocation(new Point(locationX, locationY));
         frame.setTitle("Othello: " + size + " x " + size);
         frame.setResizable(false);
@@ -240,11 +241,11 @@ public class StartupFrame extends JFrame {
             DebugFrame.initialize();
             JFrame dFrame = DebugFrame.getInstance();
             dFrame.setTitle("Debug Menu");
-            dFrame.setSize(DebugFrame.SIZE_X, DebugFrame.SIZE_Y);
+            dFrame.setSize(DebugFrame.getSizeX(), DebugFrame.getSizeY());
             dFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             dFrame.setResizable(false);
             // place window to the right of the game window
-            locationX += GameFrame.SIZE_X;
+            locationX += GameFrame.getSizeX();
             dFrame.setLocation(new Point(locationX, locationY));
             dFrame.setVisible(true);
         }

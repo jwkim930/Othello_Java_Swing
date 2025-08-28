@@ -44,6 +44,7 @@ public class Stone {
 
     /**
      * Returns the color of the stone.
+     * This is the RGB color, not the internal attribute {@code color}.
      *
      * @return The color of the stone.
      */
@@ -72,7 +73,7 @@ public class Stone {
     public boolean equals(Object obj) {
         if (obj instanceof Stone) {
             Stone s = (Stone) obj;
-            return this.color / Math.abs(this.color) == s.color / Math.abs(s.color);
+            return this.color * s.color > 0;
         }
         else {
             return false;
